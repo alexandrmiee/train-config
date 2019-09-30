@@ -1,0 +1,91 @@
+//control types for device submodules
+enum Types {
+	HYSTERESIS_INTERANL = "hin";
+	HYSTERESIS_EXTERNAL = "hout";
+	ROOM_INTERANL = "rin";
+	ROOM_EXTERNAL = "rout";
+	KEY_NO = "no";
+	KEY_NC = "nc";
+	LED_RGB = "rgb";
+	INTERNET_CLIENT = "c";
+	INTERNET_SERVER = "s";
+};
+  
+message Mesure{
+	required sint32 value = 1;
+	optional sint32 thresholdLower = 2;
+	optional sint32 thresholdUpper = 3;
+	optional int32 mesurePeriodMs = 4;
+	optional bool isError = 5;
+	optional int64 errorLastTime = 6;
+};
+
+message Control{
+	required sint32 value = 1;
+	optional Types type = 2;
+	optional string units = 3;
+	optional string note = 4;
+};
+
+message Sensor{
+	required sint32 value = 1;
+	//threshold lower
+	optional sint32 thl = 2;
+	//threshold upper
+	optional sint32 thu = 3;
+	//mesure period in ms
+	optional int32 period = 4;
+	//is error trigger occured
+	optional bool err = 5;
+	//last error trigger - time in ms
+	optional int64 elt = 6;
+	
+	optional Types type = 7;
+	optional string units = 8;
+	optional string note = 9;
+};
+
+message Server{
+	required int32 port = 1;
+	optional Types type = 2;
+	optional bool isEnable = 3;
+	optional bool enTrap  = 4;
+	optional int32 trapPort = 5;
+	optional int32 trapIp = 6;
+	optional int32 trapPeriodMs = 7;
+	optional string name = 8;
+	optional int32 errors = 9;		
+};
+
+message Clinet{
+	required int32 serverIp = 1;
+	required int32 serverPort = 2;
+	optional bool isEnable = 3;
+	optional string topic = 4;
+	optional string name = 5;
+	optional string nameFrom = 6;
+	optional string nameTo = 7;		
+	optional int32 errors = 8;		
+};
+
+message Time{
+	optional int64 time = 1;
+	optional string day = 2;
+	optional string month = 3;
+	optional string year = 4;
+}
+		
+message Module{
+	required int64 id = 1;
+		
+	repeated Sensor sensor = 2;
+			
+	repeated Control control = 3;
+	
+	repeated Server server = 4;
+		
+	repeated Client client = 5;	
+	
+	repeated Time time = 6;	
+	
+}

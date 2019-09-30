@@ -1,0 +1,16 @@
+from __future__ import unicode_literals
+from Railways import Parser
+
+
+parser = Parser.Parser()
+'''
+create iSensor project
+'''
+parser.createDatabase('iSensorDb.conf')
+parser.createModules(modules='iSensor.stations')
+parser.convertFiles(fileNames='iSensor.files.files')
+parser.migrate(fileNames='iSensor.migrate.path')
+parser.createMainTest(testTemplate='iSensor.test')
+
+
+print('\n\n\t !TrainFramework generate files end!')     

@@ -1,0 +1,73 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<link rel="stylesheet" href="index.css">
+	<script type="text/javascript" src="index.js"></script>
+	<script type="text/javascript" src="mqtt.min.js"></script>
+	<script type="text/javascript" src="vue.min.js"></script>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+</head>
+<body>
+	<template id="upload-tmpl">
+		<p>
+			<input @change="load($event)" type="file" name="file">
+			<input type="button" value="Upload"  @click="upload">
+		</p>
+	</template>
+		
+	<div id="app">
+		<header>
+			<h1>Тестовый файл для проверки работы TrainFramework</h1>
+		</header>
+		
+		<section v-for="(test, index) in tests" :key="test" :style="sectionStyle(test.isSucces)">			
+			<h2>Проверка {{ test.name }}</h2>
+			<p>{{test.result}}</p>
+			<input v-show="test.protocol" type="button" value="Повторить проверку"  @click="check(test)">
+			<upload 
+				v-show="test.upload" 
+				:test="tests[index]" 
+				@upload="tests[index].result='Проверка прошла успешно';test.isSucces=true;"
+				@error="tests[index].result='Ошибка! '+$event;test.isSucces=false;"
+			></upload>
+		</section>
+		
+		<section :style="sectionStyle(true)">			
+			<h2>База данных <input type="button" value="Запросить" @click="getDb('*','*','*')"> <input type="button" value="Сохранить все" @click="getFs"></h2>
+			<div class="database-items">
+				<div v-for="(item, i) in items" :key="item">
+					{{  Object.keys(item)[0] }} <input type="button" value="Запросить" @click="getObject(i,Object.keys(item)[0],'*','*')"> <input type="button" value="Сохранить" @click="postObject(Object.keys(item)[0],'*','*',item)">
+					<ul>
+						<li v-for="(param, idx) in Object.keys( item[ Object.keys(item)[0] ] )" :key="param" class="col-2">
+							{{param}} = <input v-model="item[Object.keys(item)[0]][param]"/>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</section>
+		
+		<section :style="sectionStyle(true)">			
+			<h2>Файловая система <input type="button" value="Запросить" @click="getFs"> <input type="button" value="Сохранить" @click="getFs"></h2>
+			<div class="col-1">
+				<div v-for="(item, i) in drives" :key="item" >
+					{{  Object.keys(item)[0] }}
+					<ul>
+						<li v-for="(param, idx) in Object.keys( item[ Object.keys(item)[0] ] )" :key="param" class="col-3">
+							{{param}} =  <input v-model="item[Object.keys(item)[0]][param]"/>
+							<input type="button" value="Список файлов" @click="getFiles(param,item[Object.keys(item)[0]][param])"></h2>
+							<div v-for="(file, ind) in files[param]" :key="file.name" style="grid-column: 1 / 4;"  class="col-4">
+								<div>{{ ind }}</div> <div>{{ file.name }}</div> <div>{{ file.size }}B</div> <div>{{ file.type }}</div>
+							</div>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</section>
+		
+		<footer>
+			<p>Автоматика&reg;</p>
+			<p><a href="http://system-design.ru/">Startup с нами!</a> </p>
+		</footer>
+	</div>
+</body>
+</html>

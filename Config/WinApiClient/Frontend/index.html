@@ -1,0 +1,40 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<link rel="stylesheet" href="index.css">
+	
+	<script type="text/javascript" src="index.js"></script>
+	<script type="text/javascript" src="vue.min.js"></script>
+</head>
+<body>
+	
+	<template id="app-tmpl">
+		<div>
+			<h2>Настройки <input type="button" value="Сохранить" @click="save"> <input type="button" value="Запустить" @click="start(1)"> <input type="button" value="Останивть" @click="start(0)"></h2>
+			
+			<table>
+			  <tr>
+				<th>Порт</th>
+				<th>Букмекерская контора</th>
+				<th>Действие</th>
+			  </tr>
+			  <tr v-for="(client,i) in clients" :key="i">
+				<td><input v-model="client.port"/></td>
+				<td><input v-model="client.bet"/></td>
+				<td>
+					<input type="button" value="Удалить" @click="deleteClient(i)">
+					<input type="checkbox" id="checkbox" v-model="client.isWork">
+					<label for="checkbox">Запущен: {{ client.isWork }}</label>
+				</td>
+			  </tr>
+			</table>
+			<input type="button" value="Добавить" @click="addClient">
+			
+		</div>
+	</template>
+	
+	<div id="app">
+		
+	</div>
+</body>
+</html>

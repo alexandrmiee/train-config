@@ -20,7 +20,7 @@
 #include "pb.h"
 #include "telnet.h"
 
-#define {{ module['debug.level']  }}
+#define {{ module.debug.level  }}
 #ifdef DEBUG_TRACE
 	#define TRACE(trace)	do{\
 								trace;\
@@ -473,24 +473,24 @@ int jsonPut(RailTelnet_st *rail){
 	return EXIT_SUCCESS;
 }
 
-Parcel_st {{ module['station.parcel'] }}[{{ module['station.parcels'] }}];
-Train_st {{ module['station.train'] }};
-//{{ module['station.railType'] }} {{ module['station.railName'] }}={NULL};
-void {{ module['station.name'] }}Init(void){
-	//{{ module['station.railName'] }}.table = getDbInstance();
+Parcel_st {{ module.station.parcel }}[{{ module.station.parcels }}];
+Train_st {{ module.station.train }};
+//{{ module.station.railType }} {{ module.station.railName }}={NULL};
+void {{ module.station.name }}Init(void){
+	//{{ module.station.railName }}.table = getDbInstance();
 
-	fillDepot(&{{ module['station.train'] }});
-	{{ module['station.train'] }}.box = malloc(sizeof(Parcel_st));
-	{{ module['station.train'] }}.box[0] = (Parcel_st*)&{{ module['station.parcel'] }};
-	{{ module['station.train'] }}.capacity = {{ module['station.parcels'] }};
-	{{ module['station.train'] }}.route = {{ module['station.route'] }};
+	fillDepot(&{{ module.station.train }});
+	{{ module.station.train }}.box = malloc(sizeof(Parcel_st));
+	{{ module.station.train }}.box[0] = (Parcel_st*)&{{ module.station.parcel }};
+	{{ module.station.train }}.capacity = {{ module.station.parcels }};
+	{{ module.station.train }}.route = {{ module.station.route }};
 }
 
 /*
  * build a railway to Json
  */
 //extern Train_st jsonTrain;
-int {{  module['station.name'] }}(void *p){
+int {{  module.station.name }}(void *p){
 	#ifdef WIN32
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	CONSOLE_SCREEN_BUFFER_INFO consoleInfo;
@@ -502,13 +502,13 @@ int {{  module['station.name'] }}(void *p){
 	#endif
 
 	//the train arrives
-	Parcel_st *box=meetTrain(&{{ module['station.train'] }});
+	Parcel_st *box=meetTrain(&{{ module.station.train }});
 	while(box){
 
 		static void *car;
 		car = box->parcel;
 
-		for(uint8_t iHitch=0;iHitch<({{  module['station.carNumber'] }}-1);iHitch++){
+		for(uint8_t iHitch=0;iHitch<({{  module.station.carNumber }}-1);iHitch++){
 			{# get the car from the train #}
 			car = ((Hitch_st*)car)->car;
 		}
@@ -516,41 +516,41 @@ int {{  module['station.name'] }}(void *p){
 		if(car==NULL) return EXIT_FAILURE;
 
 
-		{% for path in module['pathways'] %}
+		{% for path in module.pathways %}
 
-		else if( {{ path['from.command'] }} == (({{ path['from.railType'] }} *)car)->command ){
+		else if( {{ path.from.command }} == (({{ path.from.railType }} *)car)->command ){
 			/*
 			car = box->parcel;
-			for(uint8_t iHitch;iHitch<({{  module['station.carNumber'] }}-1);iHitch++){
+			for(uint8_t iHitch;iHitch<({{  module.station.carNumber }}-1);iHitch++){
 				{# get the car from the train #}
 				car = ((Hitch_st*)car)->car;
 			}
 			*/
 
 			{# get the parcel from the car #}
-			{{ path['from.railType'] }} *{{ path['from.railName'] }} = (({{ path['from.railType'] }} *)car);
+			{{ path.from.railType }} *{{ path.from.railName }} = (({{ path.from.railType }} *)car);
 
 			{# create the car for the hitch with the train #}
-			static {{ module['station.railType'] }} {{ module['station.railName'] }}_{{ loop.index0 }};
+			static {{ module.station.railType }} {{ module.station.railName }}_{{ loop.index0 }};
 
 
-			try( ({{ path['from.railName'] }}), "the rails {{ path['from.railType'] }} do not go to {{  module['station.name'] }}\n", EXIT_FAILURE );
-			{{ path['from.loader'] }}({{ path['from.railName'] }});
+			try( ({{ path.from.railName }}), "the rails {{ path.from.railType }} do not go to {{  module.station.name }}\n", EXIT_FAILURE );
+			{{ path.from.loader }}({{ path.from.railName }});
 
-			{{ path['from.railName'] }}->car = &{{ module['station.railName'] }}_{{ loop.index0 }};
-			{{ path['from.railName'] }}->command = {{ path['to.command'] }};
-			{{ path['to.loader'] }}({{ module['station.route'] }},{{ path['to.route'] }},box->parcel);
-			//(({{ path['from.railType'] }} *)car)->command = 0;
+			{{ path.from.railName }}->car = &{{ module.station.railName }}_{{ loop.index0 }};
+			{{ path.from.railName }}->command = {{ path.to.command }};
+			{{ path.to.loader }}({{ module.station.route }},{{ path.to.route }},box->parcel);
+			//(({{ path.from.railType }} *)car)->command = 0;
 		}
 
 		{% endfor %}
 
 
 		else{
-			{{ module['defaultPath.to.loader'] }}({{ module['station.route'] }},{{ module['station.routeError'] }},NULL);
+			{{ module.defaultPath.to.loader }}({{ module.station.route }},{{ module.station.routeError }},NULL);
 		}
 
-		box=meetTrain(&{{ module['station.train'] }});
+		box=meetTrain(&{{ module.station.train }});
 	}
 
 	return EXIT_SUCCESS;

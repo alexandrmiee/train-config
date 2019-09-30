@@ -14,7 +14,7 @@
 #include "{{module}}.h"
 {%endfor%}
 
-#define {{ module['debug.level']  }}
+#define {{ module.debug.level  }}
 #ifdef DEBUG_TRACE
 	#define TRACE(trace)	do{\
 								trace;\
@@ -23,7 +23,7 @@
 	#define TRACE(trace)
 #endif
 
-{% if module['fileSystem.fatfs'] %}
+{% if module.fileSystem.fatfs %}
 static FATFS ff;
 static FIL fil;
 static DIRS dir;
@@ -31,19 +31,19 @@ static FILINFO fno;
 {% endif %}
 
 
-{% for file in module['files'] %}
-extern FileDesc_st {{ file['array'] }}Descriptor;
+{% for file in module.files %}
+extern FileDesc_st {{ file.array }}Descriptor;
 {% endfor %}
 
 FileDesc_st *files[] = {
-	{% for file in module['files'] %}
-	&{{ file['array'] }}Descriptor,
+	{% for file in module.files %}
+	&{{ file.array }}Descriptor,
 	{% endfor %}
 	NULL
 };
 
-char filesBufRx[{{ module['buffer.rx'] }}];
-char filesBufTx[{{ module['buffer.tx'] }}];
+char filesBufRx[{{ module.buffer.rx }}];
+char filesBufTx[{{ module.buffer.tx }}];
 
 FileDesc_st *findFile(char *fname){
 	uint16_t len = strlen(fname);
@@ -70,7 +70,7 @@ int cd(RailHttp_st *railHitch){
 		case DISK_SD_SPI:
 		case DISK_FLASH_SPI:
 		case DISK_FLASH_MC:
-			{% if module['fileSystem.fatfs'] %}
+			{% if module.fileSystem.fatfs %}
 			if(f_chdir(railHitch->argv[ARG_DIR])){
 				TRACE(printf("\tFiles ERROR. Cannot change FATFS directory\n"););
 				return EXIT_FAILURE;
@@ -148,7 +148,7 @@ int saveFile(RailHttp_st *http,RailFiles_st *railFile){
 		case DISK_FLASH_MC:
 		case DISK_SD_SPI:
 		case DISK_FLASH_SPI:
-		{	{% if module['fileSystem.sfs'] %}
+		{	{% if module.fileSystem.sfs %}
 			//FIXME: multy thread errors
 			static uint8_t isNewFile = 1;
 			if(isNewFile){
@@ -179,7 +179,7 @@ int saveFile(RailHttp_st *http,RailFiles_st *railFile){
 			isNewFile = http->isStreamEnd;
 			while(writeChunk(http->attach,http->attachLen,http->isStreamEnd)){}
 			{% endif %}
-			{% if module['fileSystem.fatfs'] %}
+			{% if module.fileSystem.fatfs %}
 			static uint32_t len = 0;
 			if(f_write(&fil,http->attach,http->attachLen,&len)){
 				TRACE(printf("\tFiles ERROR. Cannot save FATFS file\n"););
@@ -209,7 +209,7 @@ int makeDir(Hitch_st *railHttp,RailFiles_st *railFile){
 	switch(atoi(railHttp->argv[ARG_DISK_DRIVE])){
 		case DISK_SD_SPI:
 		case DISK_FLASH_SPI:
-			{% if module['fileSystem.fatfs'] %}
+			{% if module.fileSystem.fatfs %}
 			f_mkdir(argv[ARG_DIR]);
 			railFile->respLen += snprintf(
 					railFile->response,
@@ -270,7 +270,7 @@ int getListDir(RailHttp_st *railHitch,RailFiles_st *railFile){
 			);
 		break;
 		case DISK_FLASH_MC:
-		{ {% if module['fileSystem.sfs'] %}
+		{ {% if module.fileSystem.sfs %}
 			if(!railFile->respBufLen){
 				TRACE(printf("\tFiles ERROR. Not enough memory to read directory info\n\t%s\n",railFile->response););
 				break;
@@ -336,7 +336,7 @@ int getListDir(RailHttp_st *railHitch,RailFiles_st *railFile){
 		}
 		case DISK_SD_SPI:
 		case DISK_FLASH_SPI:
-			{% if module['fileSystem.fatfs'] %}
+			{% if module.fileSystem.fatfs %}
 			if(f_chdrive(atoi(railHitch->argv[ARG_DISK_DRIVE])){
 				TRACE(printf("\tFiles ERROR. Change FATFS drive\n"););
 				return EXIT_FAILURE;
@@ -377,7 +377,7 @@ int getListDir(RailHttp_st *railHitch,RailFiles_st *railFile){
 			break;
 			{% endif %}
 		case DISK_FLASH_CAN:
-			{% if module['fileSystem.sfs'] %}
+			{% if module.fileSystem.sfs %}
 			break;
 			{% endif %}
 		default:
@@ -418,68 +418,68 @@ int getFileHttp(RailHttp_st *railHttp,RailFiles_st *railFile){
 
 {%endif%}
 
-static Parcel_st {{ module['station.parcel'] }}[{{ module['station.parcels'] }}];
-static Train_st {{ module['station.train'] }};
-static Parcel_st *pBox[{{ module['station.parcels'] }}];
-void {{ module['station.name'] }}Init(void){
-	fillDepot(&{{ module['station.train'] }});
-	{{ module['station.train'] }}.box = pBox;//malloc(sizeof(Parcel_st*)*{{ module['station.parcels'] }});
-	for(uint16_t iParcel=0;iParcel<{{ module['station.parcels'] }};iParcel++){
-		{{ module['station.train'] }}.box[iParcel] = (Parcel_st*)&{{ module['station.parcel'] }}[iParcel];
+static Parcel_st {{ module.station.parcel }}[{{ module.station.parcels }}];
+static Train_st {{ module.station.train }};
+static Parcel_st *pBox[{{ module.station.parcels }}];
+void {{ module.station.name }}Init(void){
+	fillDepot(&{{ module.station.train }});
+	{{ module.station.train }}.box = pBox;//malloc(sizeof(Parcel_st*)*{{ module.station.parcels }});
+	for(uint16_t iParcel=0;iParcel<{{ module.station.parcels }};iParcel++){
+		{{ module.station.train }}.box[iParcel] = (Parcel_st*)&{{ module.station.parcel }}[iParcel];
 	}
-	{{ module['station.train'] }}.capacity = {{ module['station.parcels'] }};
-	{{ module['station.train'] }}.route = {{ module['station.route'] }};
+	{{ module.station.train }}.capacity = {{ module.station.parcels }};
+	{{ module.station.train }}.route = {{ module.station.route }};
 }
 
 /*
  * build a railway to Json
  */
-int {{  module['station.name'] }}(void *p){
+int {{  module.station.name }}(void *p){
 
-	uint16_t iBox = meetTrainBox(&{{module['station.train'] }},0);
-	Parcel_st *box = {{module['station.train'] }}.box[iBox];
+	uint16_t iBox = meetTrainBox(&{{module.station.train }},0);
+	Parcel_st *box = {{module.station.train }}.box[iBox];
 	while(box){
-		if(iBox>{{module['station.train'] }}.capacity) return EXIT_SUCCESS;
+		if(iBox>{{module.station.train }}.capacity) return EXIT_SUCCESS;
 		{# get the car from the train #}
 		static void *car;
 		car = box->parcel;
 		{# find the car in the train that arrived #}
-		for(uint8_t iHitch=0;iHitch<({{  module['station.carNumber'] }}-1);iHitch++){
+		for(uint8_t iHitch=0;iHitch<({{  module.station.carNumber }}-1);iHitch++){
 			car = ((Hitch_st*)car)->car;
 		}
 
 		if(car==NULL) return EXIT_FAILURE;
-		{% for path in module['pathways'] %}
-		else if( {{ path['from.command'] }} == (({{ path['from.railType'] }} *)car)->command ){
+		{% for path in module.pathways %}
+		else if( {{ path.from.command }} == (({{ path.from.railType }} *)car)->command ){
 
 			{# convert from  Hitch_st type to railType #}
-			{{ path['from.railType'] }} *{{ path['from.railName'] }} = (({{ path['from.railType'] }} *)car);
+			{{ path.from.railType }} *{{ path.from.railName }} = (({{ path.from.railType }} *)car);
 
 			{# create parcel - variable to save result #}
-			static {{ module['station.railType'] }} {{ module['station.railName'] }}_{{ loop.index0 }};
+			static {{ module.station.railType }} {{ module.station.railName }}_{{ loop.index0 }};
 
-			TRACE(printf("{{ path['from.command'] }}\n\t%s\n",{{ path['from.railName'] }}->argv[0]););
+			TRACE(printf("{{ path.from.command }}\n\t%s\n",{{ path.from.railName }}->argv[0]););
 			{# execute command function #}
-			if({{ path['from.loader'] }}({{ path['from.railName'] }},&{{ module['station.railName'] }}_{{ loop.index0 }}) ==EXIT_SUCCESS){
+			if({{ path.from.loader }}({{ path.from.railName }},&{{ module.station.railName }}_{{ loop.index0 }}) ==EXIT_SUCCESS){
 
 			}
 			else{
-				TRACE(printf("{{ path['from.command'] }} error\n"););
+				TRACE(printf("{{ path.from.command }} error\n"););
 			}
 
 			{# pack parcel #}
-			{{ module['station.railName'] }}_{{ loop.index0 }}.command = {{ path['to.command'] }};
-			{{ path['from.railName'] }}->car = &{{ module['station.railName'] }}_{{ loop.index0 }};
+			{{ module.station.railName }}_{{ loop.index0 }}.command = {{ path.to.command }};
+			{{ path.from.railName }}->car = &{{ module.station.railName }}_{{ loop.index0 }};
 			{# send train with parcel #}
-			{{ path['to.loader'] }}({{ module['station.route'] }},{{ path['to.route'] }},box->parcel);
+			{{ path.to.loader }}({{ module.station.route }},{{ path.to.route }},box->parcel);
 		}
 		{% endfor %}
 		else{
-			{%if module['target']=='WIN' %}TRACE(printf("File command %I64u not found\n",((Hitch_st*)car)->command);); {%endif%}
+			{%if module.target=='WIN' %}TRACE(printf("File command %I64u not found\n",((Hitch_st*)car)->command);); {%endif%}
 		}
 		{# the train arrives #}
-		iBox = meetTrainBox(&{{module['station.train'] }},iBox);
-		box = {{module['station.train'] }}.box[iBox];
+		iBox = meetTrainBox(&{{module.station.train }},iBox);
+		box = {{module.station.train }}.box[iBox];
 	}
 
 	return EXIT_SUCCESS;

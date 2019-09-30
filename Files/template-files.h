@@ -38,12 +38,12 @@ typedef struct{
 #define HTML_CONTENT_TEXT_JS	"application/javascript"
 #define HTML_CONTENT_JSON		"application/json"
 
-{% for define in module['defines'] %}
-#define {{ define['name'] }}	{{ define['value'] }}
+{% for define in module.defines %}
+#define {{ define.name }}	{{ define.value }}
 {% endfor %}
 
-int {{ module['station.name'] }}(void *p);
-void {{ module['station.name'] }}Init(void);
+int {{ module.station.name }}(void *p);
+void {{ module.station.name }}Init(void);
 
 #endif /* FILES_H_ */
 

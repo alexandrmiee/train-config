@@ -23,7 +23,7 @@
 #define EQUAL(command,data)	(strstr(data,command))
 #define ARGS_CHECK(v,c)	((c)<2)
 
-#define {{ module['debug.level']  }}
+#define {{ module.debug.level  }}
 #ifdef DEBUG_TRACE
 	#define TRACE(trace)	do{\
 								trace;\
@@ -43,8 +43,8 @@
 						"Content-Length: %d\r\n"\
 						"Content-Encoding: gzip\r\n\r\n"
 
-char httpBufRx[{{ module['buffer.rx'] }}];
-char httpBufTx[{{ module['buffer.tx'] }}];
+char httpBufRx[{{ module.buffer.rx }}];
+char httpBufTx[{{ module.buffer.tx }}];
 
 static char *argv[32];
 static uint8_t argc;
@@ -118,25 +118,25 @@ int getAttachFile(RailHttp_st *http, RailTcp_st *tcp){
 	return EXIT_SUCCESS;
 }
 
-Parcel_st {{ module['station.parcel'] }}[{{ module['station.parcels'] }}];
-Train_st {{ module['station.train'] }};
-void {{ module['station.name'] }}Init(void){
-	fillDepot(&{{ module['station.train'] }});
-	{{ module['station.train'] }}.box = malloc(sizeof(Parcel_st*)*{{ module['station.parcels'] }});
-	for(uint16_t iParcel=0;iParcel<{{ module['station.parcels'] }};iParcel++){
-		{{ module['station.train'] }}.box[iParcel] = (Parcel_st*)&{{ module['station.parcel'] }}[iParcel];
+Parcel_st {{ module.station.parcel }}[{{ module.station.parcels }}];
+Train_st {{ module.station.train }};
+void {{ module.station.name }}Init(void){
+	fillDepot(&{{ module.station.train }});
+	{{ module.station.train }}.box = malloc(sizeof(Parcel_st*)*{{ module.station.parcels }});
+	for(uint16_t iParcel=0;iParcel<{{ module.station.parcels }};iParcel++){
+		{{ module.station.train }}.box[iParcel] = (Parcel_st*)&{{ module.station.parcel }}[iParcel];
 	}
-	{{ module['station.train'] }}.capacity = {{ module['station.parcels'] }};
-	{{ module['station.train'] }}.route = {{ module['station.route'] }};
+	{{ module.station.train }}.capacity = {{ module.station.parcels }};
+	{{ module.station.train }}.route = {{ module.station.route }};
 }
 
-int {{ module['station.name'] }}(void *p){
-	uint16_t iBox = meetTrainBox(&{{module['station.train'] }},0);
-	Parcel_st *box = {{module['station.train'] }}.box[iBox];
+int {{ module.station.name }}(void *p){
+	uint16_t iBox = meetTrainBox(&{{module.station.train }},0);
+	Parcel_st *box = {{module.station.train }}.box[iBox];
 	while(box){
 		{# the train arrives #}
 
-		if(iBox>{{module['station.train'] }}.capacity) return EXIT_SUCCESS;
+		if(iBox>{{module.station.train }}.capacity) return EXIT_SUCCESS;
 
 		{# get the car from the train #}
 		static void *car;
@@ -232,32 +232,32 @@ int {{ module['station.name'] }}(void *p){
 		//dummy if
 		if(0){}
 
-		{% for gets in module['get'] %}
-		else if(EQUAL({{ gets['from.path'] }},argv[0]) && type=={{ gets['from.type'] }}){
-			TRACE(printf("HTTP {{ gets['from.path'] }} request\n"););
+		{% for gets in module.get %}
+		else if(EQUAL({{ gets.from.path }},argv[0]) && type=={{ gets.from.type }}){
+			TRACE(printf("HTTP {{ gets.from.path }} request\n"););
 			{# create parcel - variable to save result #}
-			static {{ module['station.railType'] }} {{ module['station.railName'] }}_{{ loop.index0 }};
+			static {{ module.station.railType }} {{ module.station.railName }}_{{ loop.index0 }};
 
-			{{ module['station.railName'] }}_{{ loop.index0 }}.argv = &argv[1];
-			{{ module['station.railName'] }}_{{ loop.index0 }}.argc = argc;
-			{{ module['station.railName'] }}_{{ loop.index0 }}.response = httpBufTx;
-			{{ module['station.railName'] }}_{{ loop.index0 }}.respBufLen = sizeof(httpBufTx);
-			{{ module['station.railName'] }}_{{ loop.index0 }}.respOk = HEADER_OK_TEXT;
-			{{ module['station.railName'] }}_{{ loop.index0 }}.respErr = HEADER_ERR_404;
-			{{ module['station.railName'] }}_{{ loop.index0 }}.command = {{ gets['to.command'] }};
-			{%- if gets['from.loader'] is not none -%}
-			{{ module['station.railName'] }}_{{ loop.index0 }}.attach = body;
-			if({{ gets['from.loader'] }}(&{{ module['station.railName'] }}_{{ loop.index0 }},railTcp)!=EXIT_SUCCESS) return EXIT_SUCCESS;
+			{{ module.station.railName }}_{{ loop.index0 }}.argv = &argv[1];
+			{{ module.station.railName }}_{{ loop.index0 }}.argc = argc;
+			{{ module.station.railName }}_{{ loop.index0 }}.response = httpBufTx;
+			{{ module.station.railName }}_{{ loop.index0 }}.respBufLen = sizeof(httpBufTx);
+			{{ module.station.railName }}_{{ loop.index0 }}.respOk = HEADER_OK_TEXT;
+			{{ module.station.railName }}_{{ loop.index0 }}.respErr = HEADER_ERR_404;
+			{{ module.station.railName }}_{{ loop.index0 }}.command = {{ gets.to.command }};
+			{%- if gets.from.loader is not none -%}
+			{{ module.station.railName }}_{{ loop.index0 }}.attach = body;
+			if({{ gets.from.loader }}(&{{ module.station.railName }}_{{ loop.index0 }},railTcp)!=EXIT_SUCCESS) return EXIT_SUCCESS;
 			{% endif %}
-			railTcp->car = &{{ module['station.railName'] }}_{{ loop.index0 }};
-			{{ gets['to.loader'] }}({{ module['station.route'] }},{{ gets['to.route'] }},box->parcel);
+			railTcp->car = &{{ module.station.railName }}_{{ loop.index0 }};
+			{{ gets.to.loader }}({{ module.station.route }},{{ gets.to.route }},box->parcel);
 
 		}
 		{% endfor %}
 		railTcp->socket->stream = type;
 
-		iBox = meetTrainBox(&{{module['station.train'] }},iBox);
-		box = {{module['station.train'] }}.box[iBox];
+		iBox = meetTrainBox(&{{module.station.train }},iBox);
+		box = {{module.station.train }}.box[iBox];
 	}
 
 	return EXIT_SUCCESS;

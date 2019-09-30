@@ -43,8 +43,8 @@ int main(void) {
 
 	initAdapter();
 
-	{% for module in config['modules'] %}
-	{{ config[module]['station.name'] }}Init();
+	{% for module in config.modules %}
+	{{ config[module].station.name }}Init();
 	{% endfor %}
 
 	#ifdef WIN32
@@ -65,8 +65,8 @@ int main(void) {
 
 	for(;;) {
 		dbStation(NULL);
-		{% for module in config['modules'] %}
-		{{ config[module]['station.name'] }}(NULL);
+		{% for module in config.modules %}
+		{{ config[module].station.name }}(NULL);
 		{% endfor %}
 	}
 
@@ -104,7 +104,7 @@ DWORD WINAPI clientStation(void* p){
 
 	TcpPacket_st tcp={
 		.from_port = 0,
-		.to_port =	{{ config['port'] }},
+		.to_port =	{{ config.port }},
 		.seq_num = 0,
 		.ack_num = 0,
 		.data_offset = 0,

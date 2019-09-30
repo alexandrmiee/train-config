@@ -22,7 +22,7 @@
 #include "http.h"
 #include "mqtt.h"
 
-#define {{ module['debug.level']  }}
+#define {{ module.debug.level  }}
 #ifdef DEBUG_TRACE
 	#define TRACE(trace)	do{\
 								trace;\
@@ -32,7 +32,7 @@
 #endif
 
 {% for oid in oids %}
-#define {{ oid['name'] }} {{ oid['value'] }}
+#define {{ oid.name }} {{ oid.value }}
 {% endfor %}
 
 char **findTableKeyValueByOid(SnmpOid_st *oid){
@@ -40,11 +40,11 @@ char **findTableKeyValueByOid(SnmpOid_st *oid){
 	uint16_t iValues = 0;
 	if(0){/*dummy if*/}
 	{% for oid in oids %}
-	else if(!memcmp({{ oid['name'] }},&oid->name,oid->nameLen)){
+	else if(!memcmp({{ oid.name }},&oid->name,oid->nameLen)){
 		findValues(
 			&values[0],32,&iValues,
 			getDbInstance(),
-			{{ oid['table'] }}, {{ oid['key'] }},"*"
+			{{ oid.table }}, {{ oid.key }},"*"
 		);
 		return values;
 	}

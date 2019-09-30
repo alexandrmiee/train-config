@@ -19,7 +19,7 @@
 
 #include "database.h"
 
-int {{ module['station.name'] }}(void *p);
-void {{ module['station.name'] }}Init(void);
+int {{ module.station.name }}(void *p);
+void {{ module.station.name }}Init(void);
 
 #endif /* PB_H_ */

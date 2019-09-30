@@ -25,7 +25,7 @@ typedef struct RailHttp {
 	uint8_t isStreamEnd;
 }__attribute__ ((__packed__)) RailHttp_st;
 
-int {{ module['station.name'] }}(void *p);
-void {{ module['station.name'] }}Init(void);
+int {{ module.station.name }}(void *p);
+void {{ module.station.name }}Init(void);
 
 #endif /*HTTP_H_*/

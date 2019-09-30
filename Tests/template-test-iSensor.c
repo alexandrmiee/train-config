@@ -13,23 +13,23 @@
 #include "core-routes.h"
 #include "core-utils.h"
 
-{%for module in config['modules']%}#include "{{module}}.h"
+{%for module in config.modules%}#include "{{module}}.h"
 {%endfor%}
 #include "halInterface.h"
 
 int main(void) {
 	_init();
-	{% for module in config['modules'] %}
-	{%- if config[module]['station.name'] is not none -%}
-	{{ config[module]['station.name'] }}Init();
+	{% for module in config.modules %}
+	{%- if config[module].station.name is not none -%}
+	{{ config[module].station.name }}Init();
 	{% endif %}
 	{% endfor %}
 
 
 	for(;;) {
-		{% for module in config['modules'] %}
-		{%- if config[module]['station.name'] is not none -%}
-		{{ config[module]['station.name'] }}(NULL);
+		{% for module in config.modules %}
+		{%- if config[module].station.name is not none -%}
+		{{ config[module].station.name }}(NULL);
 		{% endif %}
 		{% endfor %}
 	}

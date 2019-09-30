@@ -18,7 +18,7 @@
 #include "flash.h"
 
 
-#define {{ module['debug.level']  }}
+#define {{ module.debug.level  }}
 #ifdef DEBUG_TRACE
 	#define TRACE(trace)	do{\
 								trace;\
@@ -44,8 +44,8 @@ typedef struct{
 	uint8_t isEnd;
 }__attribute__ ((__packed__)) FlashAddr_st;
 
-static uint8_t memBufRx[{{ module['buffer.rx'] }}];
-static uint8_t memBufTx[{{ module['buffer.tx'] }}];
+static uint8_t memBufRx[{{ module.buffer.rx }}];
+static uint8_t memBufTx[{{ module.buffer.tx }}];
 static uint8_t memBufRest[PAGE_SIZE];
 
 extern uint8_t flashTestArray[1280];
@@ -135,8 +135,8 @@ uint32_t getAddress(void){
 }
 uint8_t writeChunk(uint8_t *buf, uint32_t len,uint8_t isEnd){
 	enum States {
-		{% for state in module['states'] %}
-		{{ state['case'] }} = {{ loop.index0 }},
+		{% for state in module.states %}
+		{{ state.case }} = {{ loop.index0 }},
 		{% endfor %}
 		error
 	};
@@ -144,7 +144,7 @@ uint8_t writeChunk(uint8_t *buf, uint32_t len,uint8_t isEnd){
 	flash.cbuf = buf;
 	flash.clen = len;
 	flash.isEnd = isEnd;
-	static enum States state =  {{module['states'][0]['case']}};
+	static enum States state =  {{module.states[0].case}};
 
 
 	switch (state) {
@@ -152,17 +152,17 @@ uint8_t writeChunk(uint8_t *buf, uint32_t len,uint8_t isEnd){
 			state = error;
 		break;
 		case error:
-			state = {{module['states'][0]['case']}};
-		{% for state in module['states'] %}
-		case {{ state['case'] }}:
-			if(!{{ state['function'] }}(&flash)){
-				state = {{ state['next'] }};
-				TRACE(printf("\t{{ state['case'] }} done, len %d\n",len););
+			state = {{module.states[0].case}};
+		{% for state in module.states %}
+		case {{ state.case }}:
+			if(!{{ state.function }}(&flash)){
+				state = {{ state.next }};
+				TRACE(printf("\t{{ state.case }} done, len %d\n",len););
 			}
 			else{
 				break;
 			}
-		{% if state['break'] %}break;{% endif %}
+		{% if state.break %}break;{% endif %}
 		{% endfor %}
 	}
 	return state;

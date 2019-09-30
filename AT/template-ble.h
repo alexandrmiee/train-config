@@ -43,13 +43,13 @@ typedef struct Beacon{
 	uint8_t rsii;
 }__attribute__ ((__packed__)) Beacon_st;
 
-{% for define in module['defines'] %}
-#define {{ define['name'] }}	{{ define['value'] }}
+{% for define in module.defines %}
+#define {{ define.name }}	{{ define.value }}
 {% endfor %}
 
 
-int {{ module['station.name'] }}(void *p);
-void {{ module['station.name'] }}Init(void);
+int {{ module.station.name }}(void *p);
+void {{ module.station.name }}Init(void);
 
 #endif /* _BLE_H_ */
 

@@ -25,7 +25,7 @@
 #include 	<ws2tcpip.h>
 #endif
 
-#define {{ module["debug.level"]  }}
+#define {{ module.debug.level  }}
 #ifdef DEBUG_TRACE
 	#define TRACE(trace)	do{\
 								trace;\
@@ -59,9 +59,9 @@ int initUdpClient(uint32_t inetAddress,uint16_t port, uint8_t protocol){
 	udpConnectSocket=socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
 	if (udpConnectSocket == INVALID_SOCKET) {
-	    printf("Error at socket(): %d\n", WSAGetLastError());
-	    WSACleanup();
-	    return 1;
+		printf("Error at socket(): %d\n", WSAGetLastError());
+		WSACleanup();
+		return 1;
 	}
 
 	int i=1;
@@ -77,36 +77,36 @@ int initUdpClient(uint32_t inetAddress,uint16_t port, uint8_t protocol){
 }
 
 
-Parcel_st {{ module['station.parcel'] }}[{{ module['station.parcels'] }}];
-Train_st {{ module['station.train'] }};
-void {{ module['station.name'] }}Init(void){
-	fillDepot(&{{ module['station.train'] }});
-	{{ module['station.train'] }}.box = malloc(sizeof(Parcel_st*)*{{ module['station.parcels'] }});
-	for(uint16_t iParcel=0;iParcel<{{ module['station.parcels'] }};iParcel++){
-		{{ module['station.train'] }}.box[iParcel] = (Parcel_st*)&{{ module['station.parcel'] }}[iParcel];
+Parcel_st {{ module.station.parcel }}[{{ module.station.parcels }}];
+Train_st {{ module.station.train }};
+void {{ module.station.name }}Init(void){
+	fillDepot(&{{ module.station.train }});
+	{{ module.station.train }}.box = malloc(sizeof(Parcel_st*)*{{ module.station.parcels }});
+	for(uint16_t iParcel=0;iParcel<{{ module.station.parcels }};iParcel++){
+		{{ module.station.train }}.box[iParcel] = (Parcel_st*)&{{ module.station.parcel }}[iParcel];
 	}
-	{{ module['station.train'] }}.capacity = {{ module['station.parcels'] }};
-	{{ module['station.train'] }}.route = {{ module['station.route'] }};
+	{{ module.station.train }}.capacity = {{ module.station.parcels }};
+	{{ module.station.train }}.route = {{ module.station.route }};
 }
 
 /*
  * TCP Railway Station
  */
-int {{ module['station.name'] }}(void *p){
-	//Parcel_st *box = meetTrain(&{{module['station.train'] }});
-	uint16_t iBox = meetTrainBox(&{{module['station.train'] }},0);
-	Parcel_st *box = {{module['station.train'] }}.box[iBox];
+int {{ module.station.name }}(void *p){
+	//Parcel_st *box = meetTrain(&{{module.station.train }});
+	uint16_t iBox = meetTrainBox(&{{module.station.train }},0);
+	Parcel_st *box = {{module.station.train }}.box[iBox];
 	while(box){
-		if(iBox>{{module['station.train'] }}.capacity) return EXIT_SUCCESS;
+		if(iBox>{{module.station.train }}.capacity) return EXIT_SUCCESS;
 		printf("\nTCP Station\n");
-		printf("\t%p %d %p\n",box,iBox,&{{ module['station.parcel'] }}[iBox]);
+		printf("\t%p %d %p\n",box,iBox,&{{ module.station.parcel }}[iBox]);
 		static void *car;
 		car = box->parcel;
 
 		try((car),"\tempty car on tcp train",EXIT_FAILURE);
 		int socket = 0;
-		try(( (({{ module['station.railType'] }}*)car)->socket ),"\tInvalid socket",EXIT_FAILURE);
-		socket = (({{ module['station.railType'] }}*)car)->socket;
+		try(( (({{ module.station.railType }}*)car)->socket ),"\tInvalid socket",EXIT_FAILURE);
+		socket = (({{ module.station.railType }}*)car)->socket;
 		uint8_t i=0,slen;
 		struct sockaddr_in* sadr;
 		while(car){
@@ -115,22 +115,22 @@ int {{ module['station.name'] }}(void *p){
 				sadr = ((RailUdp_st *)car)->saddr;
 				slen = ((RailUdp_st *)car)->slen;
 			}
-			{% for path in module['pathways'] %}
+			{% for path in module.pathways %}
 
-			else if( ({{  path['from.carNumber'] }} == i) & ( {{ path['from.command'] }} == (({{ path['from.railType'] }} *)car)->command ) ){
-				TRACE(printf("\t{{ path['from.command'] }} load\n"););
+			else if( ({{  path.from.carNumber }} == i) & ( {{ path.from.command }} == (({{ path.from.railType }} *)car)->command ) ){
+				TRACE(printf("\t{{ path.from.command }} load\n"););
 				{# get the parcel from the car #}
-				{{ path['from.railType'] }} *{{ path['from.railName'] }} = (({{ path['from.railType'] }} *)car);
+				{{ path.from.railType }} *{{ path.from.railName }} = (({{ path.from.railType }} *)car);
 				{# create the car for the hitch with the train #}
-				static {{ module['station.railType'] }} {{ module['station.railName'] }}_{{ loop.index0 }}={NULL};
-				try( ({{ path['from.railName'] }}), "\tthe rails {{ path['from.railType'] }} do not go to {{  module['station.name'] }}\n", EXIT_FAILURE );
+				static {{ module.station.railType }} {{ module.station.railName }}_{{ loop.index0 }}={NULL};
+				try( ({{ path.from.railName }}), "\tthe rails {{ path.from.railType }} do not go to {{  module.station.name }}\n", EXIT_FAILURE );
 				{# load the parcel from the train #}
-				{%- if path['from.loader'] is not none -%}
-				{{ module['station.railName'] }}_{{ loop.index0 }}.response = (uint8_t*){{ path['from.railName'] }}->response;
-				{{ module['station.railName'] }}_{{ loop.index0 }}.respLen = {{ path['from.railName'] }}->respLen;
-				TRACE(printf("\tSend response:\n\t\t%d bytes\n\t\t%s\n",{{ module['station.railName'] }}_{{ loop.index0 }}.respLen,{{ module['station.railName'] }}_{{ loop.index0 }}.response););
-				for(int l=0;l<{{ module['station.railName'] }}_{{ loop.index0 }}.respLen;l++){
-					TRACE(printf("0x%02X ",{{ module['station.railName'] }}_{{ loop.index0 }}.response[l]););
+				{%- if path.from.loader is not none -%}
+				{{ module.station.railName }}_{{ loop.index0 }}.response = (uint8_t*){{ path.from.railName }}->response;
+				{{ module.station.railName }}_{{ loop.index0 }}.respLen = {{ path.from.railName }}->respLen;
+				TRACE(printf("\tSend response:\n\t\t%d bytes\n\t\t%s\n",{{ module.station.railName }}_{{ loop.index0 }}.respLen,{{ module.station.railName }}_{{ loop.index0 }}.response););
+				for(int l=0;l<{{ module.station.railName }}_{{ loop.index0 }}.respLen;l++){
+					TRACE(printf("0x%02X ",{{ module.station.railName }}_{{ loop.index0 }}.response[l]););
 				}
 				TRACE(printf("\n"););
 				{%- else %}
@@ -138,17 +138,17 @@ int {{ module['station.name'] }}(void *p){
 
 
 				{# select loader for new train #}
-				{%- if path['to.loader']=='sendto' -%}
+				{%- if path.to.loader=='sendto' -%}
 				/*
 				 * send response to TCP client or
 				 * send request to TCP server
 				 */
-				try( (socket), "\tthe rails {{ path['from.railType'] }} do not go to {{  module['station.name'] }}\n", EXIT_FAILURE );
+				try( (socket), "\tthe rails {{ path.from.railType }} do not go to {{  module.station.name }}\n", EXIT_FAILURE );
 				TRACE(printf("\t\tTo %s:%d\n\n",inet_ntoa(sadr->sin_addr), ntohs(sadr->sin_port)););
-				{{ path['to.loader'] }}(
+				{{ path.to.loader }}(
 					socket,
-					(char*){{ module['station.railName'] }}_{{ loop.index0 }}.response,
-					{{ module['station.railName'] }}_{{ loop.index0 }}.respLen,
+					(char*){{ module.station.railName }}_{{ loop.index0 }}.response,
+					{{ module.station.railName }}_{{ loop.index0 }}.respLen,
 					0,
 					(struct sockaddr*)sadr,
 					slen
@@ -158,10 +158,10 @@ int {{ module['station.name'] }}(void *p){
 				 * send message to TCP observers
 				 * example  railTcp->to_port=80 send message to ROUTE_HTTP
 				 */
-				{{ path['from.railName'] }}->car = &{{ module['station.railName'] }}_{{ loop.index0 }};
-				{{ path['to.loader'] }}({{ module['station.route'] }},{{ path['to.route'] }},box->parcel);
+				{{ path.from.railName }}->car = &{{ module.station.railName }}_{{ loop.index0 }};
+				{{ path.to.loader }}({{ module.station.route }},{{ path.to.route }},box->parcel);
 				{%- endif %}
-				(({{ path['from.railType'] }} *)car)->command = 0;
+				(({{ path.from.railType }} *)car)->command = 0;
 			}
 
 			{% endfor %}
@@ -170,9 +170,9 @@ int {{ module['station.name'] }}(void *p){
 			i++;
 		}
 
-		//box=meetTrain(&{{module['station.train'] }});
-		iBox = meetTrainBox(&{{module['station.train'] }},iBox);
-		box = {{module['station.train'] }}.box[iBox];
+		//box=meetTrain(&{{module.station.train }});
+		iBox = meetTrainBox(&{{module.station.train }},iBox);
+		box = {{module.station.train }}.box[iBox];
 	}
 	return EXIT_SUCCESS;
 }

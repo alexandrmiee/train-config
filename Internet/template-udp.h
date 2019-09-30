@@ -31,7 +31,7 @@ int initUdp(void);
 int initUdpClient(uint32_t inetAddress,uint16_t port, uint8_t protocol);
 int getUdpClientSocket();
 
-int {{ module['station.name'] }}(void *p);
-void {{ module['station.name'] }}Init(void);
+int {{ module.station.name }}(void *p);
+void {{ module.station.name }}Init(void);
 
 #endif /* _UDP_H_ */

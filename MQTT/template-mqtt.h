@@ -53,6 +53,6 @@ void TimerCountdownMS(Timer*, unsigned int);
 void TimerCountdown(Timer*, unsigned int);
 int TimerLeftMS(Timer*);
 
-int {{ module['station.name'] }}(void *p);
-void {{ module['station.name'] }}Init(void);
+int {{ module.station.name }}(void *p);
+void {{ module.station.name }}Init(void);
 #endif

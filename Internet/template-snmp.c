@@ -24,7 +24,7 @@
 #include "http.h"
 #include "mqtt.h"
 
-#define {{ module['debug.level']  }}
+#define {{ module.debug.level  }}
 #ifdef DEBUG_TRACE
 	#define TRACE(trace)	do{\
 								trace;\
@@ -34,14 +34,14 @@
 #endif
 
 
-{% for community in module['communities'] %}
-#define {{ community['name'] }} {{ community['value'] }}
+{% for community in module.communities %}
+#define {{ community.name }} {{ community.value }}
 {% endfor %}
 
 
 
-static char snmpBufTx[{{ module['buffer.tx'] }}];
-static char snmpBufRx[{{ module['buffer.rx'] }}];
+static char snmpBufTx[{{ module.buffer.tx }}];
+static char snmpBufRx[{{ module.buffer.rx }}];
 
 int snmpParser(uint8_t *request, uint16_t reqLen,uint8_t *response,uint16_t respMaxLen){
 	uint8_t res = SNMP_ERR_NO;
@@ -188,27 +188,27 @@ int snmpParser(uint8_t *request, uint16_t reqLen,uint8_t *response,uint16_t resp
 }
 
 
-Parcel_st {{ module['station.parcel'] }}[{{ module['station.parcels'] }}];
-Train_st {{ module['station.train'] }};
-void {{ module['station.name'] }}Init(void){
-	fillDepot(&{{ module['station.train'] }});
-	{{ module['station.train'] }}.box = malloc(sizeof(Parcel_st*)*{{ module['station.parcels'] }});
-	for(uint16_t iParcel=0;iParcel<{{ module['station.parcels'] }};iParcel++){
-		{{ module['station.train'] }}.box[iParcel] = (Parcel_st*)&{{ module['station.parcel'] }}[iParcel];
+Parcel_st {{ module.station.parcel }}[{{ module.station.parcels }}];
+Train_st {{ module.station.train }};
+void {{ module.station.name }}Init(void){
+	fillDepot(&{{ module.station.train }});
+	{{ module.station.train }}.box = malloc(sizeof(Parcel_st*)*{{ module.station.parcels }});
+	for(uint16_t iParcel=0;iParcel<{{ module.station.parcels }};iParcel++){
+		{{ module.station.train }}.box[iParcel] = (Parcel_st*)&{{ module.station.parcel }}[iParcel];
 	}
-	{{ module['station.train'] }}.capacity = {{ module['station.parcels'] }};
-	{{ module['station.train'] }}.route = {{ module['station.route'] }};
+	{{ module.station.train }}.capacity = {{ module.station.parcels }};
+	{{ module.station.train }}.route = {{ module.station.route }};
 }
 
 /*
  * build a railway to SNMP
  */
-int {{ module['station.name'] }}(void *p){
-	uint16_t iBox = meetTrainBox(&{{module['station.train'] }},0);
-	Parcel_st *box = {{module['station.train'] }}.box[iBox];
+int {{ module.station.name }}(void *p){
+	uint16_t iBox = meetTrainBox(&{{module.station.train }},0);
+	Parcel_st *box = {{module.station.train }}.box[iBox];
 	while(box){
 		{# the train arrives #}
-		if(iBox>{{module['station.train'] }}.capacity) return EXIT_SUCCESS;
+		if(iBox>{{module.station.train }}.capacity) return EXIT_SUCCESS;
 		printf("\nSNMP Station\n");
 		{# get the car from the train #}
 		static void *car;
@@ -246,8 +246,8 @@ int {{ module['station.name'] }}(void *p){
 			car = ((Hitch_st*)car)->car;
 			i++;
 		}
-		iBox = meetTrainBox(&{{module['station.train'] }},iBox);
-		box = {{module['station.train'] }}.box[iBox];
+		iBox = meetTrainBox(&{{module.station.train }},iBox);
+		box = {{module.station.train }}.box[iBox];
 	}
 
 	return EXIT_SUCCESS;

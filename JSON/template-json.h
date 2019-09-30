@@ -29,8 +29,8 @@ typedef struct RailJson{
 }__attribute__ ((__packed__)) RailJson_st;
 
 
-int {{ module['station.name'] }}(void *p);
-void {{ module['station.name'] }}Init(void);
+int {{ module.station.name }}(void *p);
+void {{ module.station.name }}Init(void);
 
 #endif /* JSON_H_ */
 

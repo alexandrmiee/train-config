@@ -20,7 +20,7 @@
 #include "serial.h"
 #include "ow.h"
 
-#define {{ module['debug.level']  }}
+#define {{ module.debug.level  }}
 #ifdef DEBUG_TRACE
 	#define TRACE(trace)	do{\
 								trace;\
@@ -36,9 +36,9 @@
 
 static scrathpad_t scrathpad;
 static scrathpad_t command;
-static Parcel_st {{ module['station.parcel'] }}[{{ module['station.parcels'] }}];
-static Train_st {{ module['station.train'] }};
-static Parcel_st *pBox[{{ module['station.parcels'] }}];
+static Parcel_st {{ module.station.parcel }}[{{ module.station.parcels }}];
+static Train_st {{ module.station.train }};
+static Parcel_st *pBox[{{ module.station.parcels }}];
 
 static int stretchByte(uint8_t* buf,uint16_t bufLen, uint16_t byte){
 	if(bufLen<16){
@@ -80,7 +80,7 @@ static float convertValue(uint8_t* buf,uint16_t bufLen){
 
 static void rwUart(uint8_t* buf, uint32_t lenOut, uint8_t* mes, uint32_t lenIn,uint32_t baud){
 	static RailOw_st ow;
-	Parcel_st *box = {{module['station.train'] }}.box[0];
+	Parcel_st *box = {{module.station.train }}.box[0];
 	ow.command = COMMAND_SERIAL_SEND;
 	ow.request = mes;
 	ow.reqLen = lenOut;
@@ -88,7 +88,7 @@ static void rwUart(uint8_t* buf, uint32_t lenOut, uint8_t* mes, uint32_t lenIn,u
 	ow.respBufLen = lenIn;
 	ow.baud = baud;
 	box->parcel = &ow;
-	sendTrainsFromDepot({{ module['station.route'] }},ROUTE_SERIAL,box->parcel);
+	sendTrainsFromDepot({{ module.station.route }},ROUTE_SERIAL,box->parcel);
 }
 
 static int owCycle(stateOwreset_t state){
@@ -152,14 +152,14 @@ static int owCycle(stateOwreset_t state){
 }
 
 
-void {{ module['station.name'] }}Init(void){
-	fillDepot(&{{ module['station.train'] }});
-	{{ module['station.train'] }}.box = pBox;//malloc(sizeof(Parcel_st*)*{{ module['station.parcels'] }});
-	for(uint16_t iParcel=0;iParcel<{{ module['station.parcels'] }};iParcel++){
-		{{ module['station.train'] }}.box[iParcel] = (Parcel_st*)&{{ module['station.parcel'] }}[iParcel];
+void {{ module.station.name }}Init(void){
+	fillDepot(&{{ module.station.train }});
+	{{ module.station.train }}.box = pBox;//malloc(sizeof(Parcel_st*)*{{ module.station.parcels }});
+	for(uint16_t iParcel=0;iParcel<{{ module.station.parcels }};iParcel++){
+		{{ module.station.train }}.box[iParcel] = (Parcel_st*)&{{ module.station.parcel }}[iParcel];
 	}
-	{{ module['station.train'] }}.capacity = {{ module['station.parcels'] }};
-	{{ module['station.train'] }}.route = {{ module['station.route'] }};
+	{{ module.station.train }}.capacity = {{ module.station.parcels }};
+	{{ module.station.train }}.route = {{ module.station.route }};
 
 }
 
@@ -169,39 +169,39 @@ stateOwreset_t getOwState(){
 	return state;
 }
 
-int {{  module['station.name'] }}(void *p){
-	uint16_t iBox = meetTrainBox(&{{module['station.train'] }},0);
-	Parcel_st *box = {{module['station.train'] }}.box[iBox];
+int {{  module.station.name }}(void *p){
+	uint16_t iBox = meetTrainBox(&{{module.station.train }},0);
+	Parcel_st *box = {{module.station.train }}.box[iBox];
 	while(box){
-		if(iBox>{{module['station.train'] }}.capacity) return EXIT_SUCCESS;
+		if(iBox>{{module.station.train }}.capacity) return EXIT_SUCCESS;
 
 		static void *car;
 		car = box->parcel;
 		if(car==NULL) return EXIT_FAILURE;
-		{% for path in module['pathways'] %}
-		else if( {{ path['from.command'] }} == (({{ path['from.railType'] }} *)car)->command ){
-			state = (stateOwreset_t)({{ path['state'] }});
+		{% for path in module.pathways %}
+		else if( {{ path.from.command }} == (({{ path.from.railType }} *)car)->command ){
+			state = (stateOwreset_t)({{ path.state }});
 			//get the parcel from the car
-			{{ path['from.railType'] }} *{{ path['from.railName'] }} = (({{ path['from.railType'] }} *)car);
-			try( ({{ path['from.railName'] }}), "the rails {{ path['from.railType'] }} do not go to {{  module['station.name'] }}\n", EXIT_FAILURE );
-			{% if path['from.loader'] %}
-			{{ path['from.loader'] }}(state);
+			{{ path.from.railType }} *{{ path.from.railName }} = (({{ path.from.railType }} *)car);
+			try( ({{ path.from.railName }}), "the rails {{ path.from.railType }} do not go to {{  module.station.name }}\n", EXIT_FAILURE );
+			{% if path.from.loader %}
+			{{ path.from.loader }}(state);
 			{% endif %}
-			{% if path['to.loader'] %}
-			{{ path['from.railName'] }}->car = &{{ module['station.railName'] }}_{{ loop.index0 }};
-			{{ module['station.railName'] }}_{{ loop.index0 }}.command = {{ path['to.command'] }};
-			{{ path['to.loader'] }}({{ module['station.route'] }},{{ path['to.route'] }},box->parcel);
+			{% if path.to.loader %}
+			{{ path.from.railName }}->car = &{{ module.station.railName }}_{{ loop.index0 }};
+			{{ module.station.railName }}_{{ loop.index0 }}.command = {{ path.to.command }};
+			{{ path.to.loader }}({{ module.station.route }},{{ path.to.route }},box->parcel);
 			{% endif %}
 		}
 		{% endfor %}
-		{% if module['defaultPath.to.loader'] %}
+		{% if module.defaultPath.to.loader %}
 		else{
-			{{ module['defaultPath.to.loader'] }}({{ module['station.route'] }},{{ module['station.routeError'] }},NULL);
+			{{ module.defaultPath.to.loader }}({{ module.station.route }},{{ module.station.routeError }},NULL);
 		}
 		{% endif %}
 
-		iBox = meetTrainBox(&{{module['station.train'] }},iBox);
-		box = {{module['station.train'] }}.box[iBox];
+		iBox = meetTrainBox(&{{module.station.train }},iBox);
+		box = {{module.station.train }}.box[iBox];
 	}
 
 	return EXIT_SUCCESS;

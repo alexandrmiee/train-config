@@ -31,8 +31,8 @@ int testStation(void* p);
 int main(void) {
 
 
-	{% for module in config['modules'] %}
-	{{ config[module]['station.name'] }}Init();
+	{% for module in config.modules %}
+	{{ config[module].station.name }}Init();
 	{% endfor %}
 
 	printf("all stations init, wait new connection\n");
@@ -43,8 +43,8 @@ int main(void) {
 		dbStation(NULL);
 		if(testStation(NULL)==EXIT_FAILURE)
 			return EXIT_FAILURE;
-		{% for module in config['modules'] %}
-		{{ config[module]['station.name'] }}(NULL);
+		{% for module in config.modules %}
+		{{ config[module].station.name }}(NULL);
 		{% endfor %}
 	}
 

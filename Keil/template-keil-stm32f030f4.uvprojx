@@ -335,7 +335,7 @@
               <MiscControls></MiscControls>
               <Define>STM32F030,STM32F030x6, USE_STDPERIPH_DRIVER,</Define>
               <Undefine></Undefine>
-              <IncludePath>{% for module in modules %}..\{{ module['folder'] }};{% endfor %}..\HAL;..\STM32F0xx_StdPeriph_Driver;..\STM32F0xx_StdPeriph_Driver\inc;..\STM32F0xx_StdPeriph_Driver\src;..\STM32F0xx_StdPeriph_Driver\STM32F0xx\Include</IncludePath>
+              <IncludePath>{% for module in modules %}..\{{ module.folder }};{% endfor %}..\HAL;..\STM32F0xx_StdPeriph_Driver;..\STM32F0xx_StdPeriph_Driver\inc;..\STM32F0xx_StdPeriph_Driver\src;..\STM32F0xx_StdPeriph_Driver\STM32F0xx\Include</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -378,13 +378,13 @@
       <Groups>
 		{% for module in modules %}
         <Group>
-          <GroupName>{{ module['folder'] }}</GroupName>
+          <GroupName>{{ module.folder }}</GroupName>
           <Files>
-			{% for file in module['files'] %}
+			{% for file in module.files %}
             <File>
-              <FileName>{{file['fileName']}}</FileName>
-              <FileType>{{file['fileType']}}</FileType>
-              <FilePath>..\{{ module['folder'] }}\{{file['fileName']}}</FilePath>
+              <FileName>{{file.fileName}}</FileName>
+              <FileType>{{file.fileType}}</FileType>
+              <FilePath>..\{{ module.folder }}\{{file.fileName}}</FilePath>
             </File>
 			{% endfor %}
           </Files>

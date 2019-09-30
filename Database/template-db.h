@@ -37,7 +37,7 @@ typedef struct RailDb{
 	int(*function)(struct RailDb *params, Parcel_st* box);
 }RailDb_st;
 
-{{ module['typedef'] }}
+{{ module.typedef }}
 
 uint8_t strConfigLen(char *param);
 uint8_t strConfigTableLen(char *param);
@@ -48,8 +48,8 @@ ModuleDb_st *getDbConfig(void);
 
 int findValues(char **argv,uint32_t resultLenMax,uint16_t* argc,DbTable_st *db,char* name,char *key, char *value);
 int findTablesWithKeyValue(char **argv,uint32_t resultLenMax,uint16_t* argc,DbTable_st *db,char* name,char *key, char *value);
-int {{ module['station.name'] }}(void *p);
-void {{ module['station.name'] }}Init(void);
+int {{ module.station.name }}(void *p);
+void {{ module.station.name }}Init(void);
 
 #endif /* DATABASE_H_ */
 

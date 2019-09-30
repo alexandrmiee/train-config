@@ -22,7 +22,7 @@
 #define EQUAL(command,data)	(restParser(data,telnetBufRx,sizeof(telnetBufRx),(command)," ",&argv[0],&argc,32)==EXIT_SUCCESS)
 #define ARGS_CHECK(v,c)	((c)!=4)
 
-#define {{ module['debug.level']  }}
+#define {{ module.debug.level  }}
 #ifdef DEBUG_TRACE
 	#define TRACE(trace)	do{\
 								trace;\
@@ -53,27 +53,27 @@ static char *argv[32];
 static uint8_t argc;
 
 
-Parcel_st {{ module['station.parcel'] }}[{{ module['station.parcels'] }}];
-Train_st {{ module['station.train'] }};
-void {{ module['station.name'] }}Init(void){
-	fillDepot(&{{ module['station.train'] }});
-	{{ module['station.train'] }}.box = malloc(sizeof(Parcel_st*)*{{ module['station.parcels'] }});
-	for(uint16_t iParcel=0;iParcel<{{ module['station.parcels'] }};iParcel++){
-		{{ module['station.train'] }}.box[iParcel] = (Parcel_st*)&{{ module['station.parcel'] }}[iParcel];
+Parcel_st {{ module.station.parcel }}[{{ module.station.parcels }}];
+Train_st {{ module.station.train }};
+void {{ module.station.name }}Init(void){
+	fillDepot(&{{ module.station.train }});
+	{{ module.station.train }}.box = malloc(sizeof(Parcel_st*)*{{ module.station.parcels }});
+	for(uint16_t iParcel=0;iParcel<{{ module.station.parcels }};iParcel++){
+		{{ module.station.train }}.box[iParcel] = (Parcel_st*)&{{ module.station.parcel }}[iParcel];
 	}
-	{{ module['station.train'] }}.capacity = {{ module['station.parcels'] }};
-	{{ module['station.train'] }}.route = {{ module['station.route'] }};
+	{{ module.station.train }}.capacity = {{ module.station.parcels }};
+	{{ module.station.train }}.route = {{ module.station.route }};
 }
 
-int {{ module['station.name'] }}(void *p){
-	uint16_t iBox = meetTrainBox(&{{module['station.train'] }},0);
-	Parcel_st *box = {{module['station.train'] }}.box[iBox];
+int {{ module.station.name }}(void *p){
+	uint16_t iBox = meetTrainBox(&{{module.station.train }},0);
+	Parcel_st *box = {{module.station.train }}.box[iBox];
 	while(box){
 		{# the train arrives #}
-		//box=meetTrain( &{{ module['station.train'] }} );
+		//box=meetTrain( &{{ module.station.train }} );
 		//try( (box),"HTTP train is empty",EXIT_SUCCESS);
 
-		if(iBox>{{module['station.train'] }}.capacity) return EXIT_SUCCESS;
+		if(iBox>{{module.station.train }}.capacity) return EXIT_SUCCESS;
 
 		static void *car;
 		car = box->parcel;
@@ -86,30 +86,30 @@ int {{ module['station.name'] }}(void *p){
 		}
 
 
-		{% for path in module['pathways'] %}
+		{% for path in module.pathways %}
 
-		else if(EQUAL({{ path['from.command'] }},(char*)((({{ path['from.railType'] }}*)car)->packet->data))){
+		else if(EQUAL({{ path.from.command }},(char*)((({{ path.from.railType }}*)car)->packet->data))){
 			if(ARGS_CHECK(argv,argc))
 				TRACE(printf("Telnet ERROR. Arguments error %d",argc););
-//				sendTrainsFromDepot({{ module['station.route'] }},ROUTE_TCP,box->parcel);
+//				sendTrainsFromDepot({{ module.station.route }},ROUTE_TCP,box->parcel);
 			else{
 				{# get the parcel from the car #}
-				{{ path['from.railType'] }} *{{ path['from.railName'] }} = (({{ path['from.railType'] }} *)car);
+				{{ path.from.railType }} *{{ path.from.railName }} = (({{ path.from.railType }} *)car);
 				{# create the car for the hitch with the train #}
-				static {{ module['station.railType'] }} {{ module['station.railName'] }}_{{ loop.index0 }};
+				static {{ module.station.railType }} {{ module.station.railName }}_{{ loop.index0 }};
 
-				try( ({{ path['from.railName'] }}), "the rails {{ path['from.railType'] }} do not go to {{  module['station.name'] }}\n", EXIT_FAILURE );
+				try( ({{ path.from.railName }}), "the rails {{ path.from.railType }} do not go to {{  module.station.name }}\n", EXIT_FAILURE );
 
-				(({{ path['from.railType'] }}*)car)->car = &{{ module['station.railName'] }}_{{ loop.index0 }};
-				{{ path['to.loader'] }}({{ module['station.route'] }},{{ path['to.route'] }},box->parcel);
+				(({{ path.from.railType }}*)car)->car = &{{ module.station.railName }}_{{ loop.index0 }};
+				{{ path.to.loader }}({{ module.station.route }},{{ path.to.route }},box->parcel);
 
-				{{ module['station.railName'] }}_{{ loop.index0 }}.command = {{ path['to.command'] }};
-				{{ module['station.railName'] }}_{{ loop.index0 }}.argv = &argv[0];
-				{{ module['station.railName'] }}_{{ loop.index0 }}.argc = argc;
-				{{ module['station.railName'] }}_{{ loop.index0 }}.response = telnetBufTx;
-				{{ module['station.railName'] }}_{{ loop.index0 }}.respBufLen = sizeof(telnetBufTx);
-				{{ module['station.railName'] }}_{{ loop.index0 }}.respOk = telnetCursor;
-				{{ module['station.railName'] }}_{{ loop.index0 }}.respErr = telnetCursor;
+				{{ module.station.railName }}_{{ loop.index0 }}.command = {{ path.to.command }};
+				{{ module.station.railName }}_{{ loop.index0 }}.argv = &argv[0];
+				{{ module.station.railName }}_{{ loop.index0 }}.argc = argc;
+				{{ module.station.railName }}_{{ loop.index0 }}.response = telnetBufTx;
+				{{ module.station.railName }}_{{ loop.index0 }}.respBufLen = sizeof(telnetBufTx);
+				{{ module.station.railName }}_{{ loop.index0 }}.respOk = telnetCursor;
+				{{ module.station.railName }}_{{ loop.index0 }}.respErr = telnetCursor;
 			}
 		}
 
@@ -118,10 +118,10 @@ int {{ module['station.name'] }}(void *p){
 
 
 		if( (box->sender==ROUTE_TCP) & (((RailTcp_st*)car)->respLen) )
-			sendTrainsFromDepot({{ module['station.route'] }},ROUTE_TCP,box->parcel);
+			sendTrainsFromDepot({{ module.station.route }},ROUTE_TCP,box->parcel);
 
-		iBox = meetTrainBox(&{{module['station.train'] }},iBox);
-		box = {{module['station.train'] }}.box[iBox];
+		iBox = meetTrainBox(&{{module.station.train }},iBox);
+		box = {{module.station.train }}.box[iBox];
 	}
 
 	return EXIT_SUCCESS;

@@ -53,14 +53,14 @@ typedef enum {
 	ow_fault
 }stateOwreset_t;
 
-{% for define in module['defines'] %}
-#define {{ define['name'] }}	{{ define['value'] }}
+{% for define in module.defines %}
+#define {{ define.name }}	{{ define.value }}
 {% endfor %}
 
 stateOwreset_t getOwState(void);
 
-int {{ module['station.name'] }}(void *p);
-void {{ module['station.name'] }}Init(void);
+int {{ module.station.name }}(void *p);
+void {{ module.station.name }}Init(void);
 
 #endif /* _OW_H_ */
 

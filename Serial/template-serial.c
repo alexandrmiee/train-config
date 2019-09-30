@@ -19,7 +19,7 @@
 {%for module in modules%}#include "{{module}}.h"
 {%endfor%}
 
-#define {{ module['debug.level']  }}
+#define {{ module.debug.level  }}
 #ifdef DEBUG_TRACE
 	#define TRACE(trace)	do{\
 								trace;\
@@ -28,7 +28,7 @@
 	#define TRACE(trace)
 #endif
 
-{% if module['hal'] %}#include "halInterface.h"
+{% if module.hal %}#include "halInterface.h"
 {% else %}
 int _uartDmaIO(Socket_st* socket){
 	TRACE(printf("\n"););
@@ -54,11 +54,11 @@ Socket_st *getBleTxSocket(){
 }
 {% endif %}
 
-static char serialBufTx[{{ module['buffer.tx'] }}];
-static char serialBufRx[{{ module['buffer.rx'] }}];
-static Parcel_st {{ module['station.parcel'] }}[{{ module['station.parcels'] }}];
-static Train_st {{ module['station.train'] }};
-static Parcel_st *pBox[{{ module['station.parcels'] }}];
+static char serialBufTx[{{ module.buffer.tx }}];
+static char serialBufRx[{{ module.buffer.rx }}];
+static Parcel_st {{ module.station.parcel }}[{{ module.station.parcels }}];
+static Train_st {{ module.station.train }};
+static Parcel_st *pBox[{{ module.station.parcels }}];
 
 
 uint8_t sendSerialAsync(Hitch_st *hitch, RailSerial_st *serial){
@@ -67,12 +67,12 @@ uint8_t sendSerialAsync(Hitch_st *hitch, RailSerial_st *serial){
 			default:
 				TRACE(printf("\tSend serial ERROR. Socket not found\n"););
 			break;
-			{% for socket in module['sockets'] %}
-			case {{ socket['id'] }}:
-			{ {% if module['hal'] %}
-				{{ socket['function'] }}(({{ socket['descriptor'] }}*)serial->socket);
+			{% for socket in module.sockets %}
+			case {{ socket.id }}:
+			{ {% if module.hal %}
+				{{ socket.function }}(({{ socket.descriptor }}*)serial->socket);
 				{% else %}
-				{{ socket['function'] }}((Socket_st*)serial->socket);{% endif %}
+				{{ socket.function }}((Socket_st*)serial->socket);{% endif %}
 			}
 			break;
 			{% endfor %}
@@ -88,15 +88,15 @@ int serialPoll(RailSerial_st *serial){
 			switch (serial->socket->id) {
 				default:
 				break;
-				{% for socket in module['sockets'] %}
-				case {{ socket['id'] }}:
-				{ {% if module['hal'] %}
-					rest = {{ socket['callback'] }}(({{ socket['descriptor'] }}*)serial->socket);
+				{% for socket in module.sockets %}
+				case {{ socket.id }}:
+				{ {% if module.hal %}
+					rest = {{ socket.callback }}(({{ socket.descriptor }}*)serial->socket);
 					{% else %}
-					rest = {{ socket['callback'] }}((Socket_st*)serial->socket);{% endif %}
+					rest = {{ socket.callback }}((Socket_st*)serial->socket);{% endif %}
 					if(serial->socket->bufLen>rest){
 						serial->socket->bufLen = rest;
-						sendTrainsFromDepot({{ module['station.route'] }},serial->routeResp,serial);
+						sendTrainsFromDepot({{ module.station.route }},serial->routeResp,serial);
 					}
 				}
 				break;
@@ -108,71 +108,71 @@ int serialPoll(RailSerial_st *serial){
 }
 
 
-void {{ module['station.name'] }}Init(void){
-	fillDepot(&{{ module['station.train'] }});
-	{{ module['station.train'] }}.box = pBox;
-	for(uint16_t iParcel=0;iParcel<{{ module['station.parcels'] }};iParcel++){
-		{{ module['station.train'] }}.box[iParcel] = (Parcel_st*)&{{ module['station.parcel'] }}[iParcel];
+void {{ module.station.name }}Init(void){
+	fillDepot(&{{ module.station.train }});
+	{{ module.station.train }}.box = pBox;
+	for(uint16_t iParcel=0;iParcel<{{ module.station.parcels }};iParcel++){
+		{{ module.station.train }}.box[iParcel] = (Parcel_st*)&{{ module.station.parcel }}[iParcel];
 	}
-	{{ module['station.train'] }}.capacity = {{ module['station.parcels'] }};
-	{{ module['station.train'] }}.route = {{ module['station.route'] }};
+	{{ module.station.train }}.capacity = {{ module.station.parcels }};
+	{{ module.station.train }}.route = {{ module.station.route }};
 }
 
-int {{  module['station.name'] }}(void *p){
-	{% for path in module['pathways'] %}
-	static {{ module['station.railType'] }} {{ module['station.railName'] }}_{{ loop.index0 }};
-	serialPoll(&{{ module['station.railName'] }}_{{ loop.index0 }});
+int {{  module.station.name }}(void *p){
+	{% for path in module.pathways %}
+	static {{ module.station.railType }} {{ module.station.railName }}_{{ loop.index0 }};
+	serialPoll(&{{ module.station.railName }}_{{ loop.index0 }});
 	{% endfor %}
 
-	uint16_t iBox = meetTrainBox(&{{module['station.train'] }},0);
-	Parcel_st *box = {{module['station.train'] }}.box[iBox];
+	uint16_t iBox = meetTrainBox(&{{module.station.train }},0);
+	Parcel_st *box = {{module.station.train }}.box[iBox];
 	while(box){
-		if(iBox>{{module['station.train'] }}.capacity) return EXIT_SUCCESS;
+		if(iBox>{{module.station.train }}.capacity) return EXIT_SUCCESS;
 
 		static void *car;
 		car = box->parcel;
 		uint8_t i=0;
 
 		while(car){
-			{%if module['target']=='WIN' %}TRACE(printf("\tSerial car number %d command (Hitch_st) %I64u\n",i,((Hitch_st *)car)->command);); {%endif%}
+			{%if module.target=='WIN' %}TRACE(printf("\tSerial car number %d command (Hitch_st) %I64u\n",i,((Hitch_st *)car)->command);); {%endif%}
 			if(0==1){}
-			{% for path in module['pathways'] %}
-			else if( {{ path['from.command'] }} == (({{ path['from.railType'] }} *)car)->command ){
-				TRACE(printf("\t{{ path['from.command'] }}\n"););
+			{% for path in module.pathways %}
+			else if( {{ path.from.command }} == (({{ path.from.railType }} *)car)->command ){
+				TRACE(printf("\t{{ path.from.command }}\n"););
 				// get the parcel from the car
-				{{ path['from.railType'] }} *{{ path['from.railName'] }} = (({{ path['from.railType'] }} *)car);
+				{{ path.from.railType }} *{{ path.from.railName }} = (({{ path.from.railType }} *)car);
 
 
-				try( ({{ path['from.railName'] }}), "the rails {{ path['from.railType'] }} do not go to {{  module['station.name'] }}\n", EXIT_FAILURE );
-				{{ module['station.railName'] }}_{{ loop.index0 }}.socket = (Socket_st*){{ path['from.socket'] }};
-				{{ module['station.railName'] }}_{{ loop.index0 }}.socket->bufLen = {{ path['from.railName'] }}->respLen;
-				{{ module['station.railName'] }}_{{ loop.index0 }}.socket->buffer = {{ path['from.railName'] }}->response;
-				{{ module['station.railName'] }}_{{ loop.index0 }}.routeResp = {{ path['to.route'] }};
-				{{ module['station.railName'] }}_{{ loop.index0 }}.command = {{ path['to.command'] }};
-				{% if path['from.loader'] %}
-				{{ path['from.loader'] }}((Hitch_st*){{ path['from.railName'] }},&{{ module['station.railName'] }}_{{ loop.index0 }});
+				try( ({{ path.from.railName }}), "the rails {{ path.from.railType }} do not go to {{  module.station.name }}\n", EXIT_FAILURE );
+				{{ module.station.railName }}_{{ loop.index0 }}.socket = (Socket_st*){{ path.from.socket }};
+				{{ module.station.railName }}_{{ loop.index0 }}.socket->bufLen = {{ path.from.railName }}->respLen;
+				{{ module.station.railName }}_{{ loop.index0 }}.socket->buffer = {{ path.from.railName }}->response;
+				{{ module.station.railName }}_{{ loop.index0 }}.routeResp = {{ path.to.route }};
+				{{ module.station.railName }}_{{ loop.index0 }}.command = {{ path.to.command }};
+				{% if path.from.loader %}
+				{{ path.from.loader }}((Hitch_st*){{ path.from.railName }},&{{ module.station.railName }}_{{ loop.index0 }});
 				{% endif %}
 
-				{% if path['to.loader'] %}
-				{{ path['from.railName'] }}->car = &{{ module['station.railName'] }}_{{ loop.index0 }};
-				{{ module['station.railName'] }}_{{ loop.index0 }}.command = {{ path['to.command'] }};
+				{% if path.to.loader %}
+				{{ path.from.railName }}->car = &{{ module.station.railName }}_{{ loop.index0 }};
+				{{ module.station.railName }}_{{ loop.index0 }}.command = {{ path.to.command }};
 
-				{{ path['to.loader'] }}((Hitch_st*){{ module['station.route'] }},{{ path['to.route'] }},box->parcel);
+				{{ path.to.loader }}((Hitch_st*){{ module.station.route }},{{ path.to.route }},box->parcel);
 				{% endif %}
 			}
 
 			{% endfor %}
-			{% if module['defaultPath.to.loader'] %}
+			{% if module.defaultPath.to.loader %}
 			else{
-				{{ module['defaultPath.to.loader'] }}({{ module['station.route'] }},{{ module['station.routeError'] }},NULL);
+				{{ module.defaultPath.to.loader }}({{ module.station.route }},{{ module.station.routeError }},NULL);
 			}
 			{% endif %}
 			car = ((Hitch_st*)car)->car;
 			i++;
 		}
 
-		iBox = meetTrainBox(&{{module['station.train'] }},iBox);
-		box = {{module['station.train'] }}.box[iBox];
+		iBox = meetTrainBox(&{{module.station.train }},iBox);
+		box = {{module.station.train }}.box[iBox];
 	}
 
 	return EXIT_SUCCESS;

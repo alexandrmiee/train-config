@@ -335,7 +335,7 @@
               <MiscControls></MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>{% for module in modules %}..\{{ module['folder'] }};{% endfor %}</IncludePath>
+              <IncludePath>{% for module in modules %}..\{{ module.folder }};{% endfor %}</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -379,13 +379,13 @@
 		{% set file_idx = 1 %}
 		{% for module in modules %}
         <Group>
-          <GroupName>{{ module['folder'] }}</GroupName>
+          <GroupName>{{ module.folder }}</GroupName>
           <Files>
-			{% for file in module['files'] %}
+			{% for file in module.files %}
             <File>
-              <FileName>{{file['fileName']}}</FileName>
-              <FileType>{{file['fileType']}}</FileType>
-              <FilePath>..\{{ module['folder'] }}\{{file['fileName']}}</FilePath>
+              <FileName>{{file.fileName}}</FileName>
+              <FileType>{{file.fileType}}</FileType>
+              <FilePath>..\{{ module.folder }}\{{file.fileName}}</FilePath>
             </File>
 			{% endfor %}
           </Files>

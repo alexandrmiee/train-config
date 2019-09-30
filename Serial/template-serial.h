@@ -40,13 +40,13 @@ typedef struct RailSerial{
 	//uint8_t socketId;
 }__attribute__ ((__packed__)) RailSerial_st;
 
-{% for define in module['defines'] %}
-#define {{ define['name'] }}	{{ define['value'] }}
+{% for define in module.defines %}
+#define {{ define.name }}	{{ define.value }}
 {% endfor %}
 
 
-int {{ module['station.name'] }}(void *p);
-void {{ module['station.name'] }}Init(void);
+int {{ module.station.name }}(void *p);
+void {{ module.station.name }}Init(void);
 
 #endif /* _SERIAL_H_ */
 

@@ -51,8 +51,8 @@ int main(void) {
 
 	initAdapter();
 
-	{% for module in config['modules'] %}
-	{{ config[module]['station.name'] }}Init();
+	{% for module in config.modules %}
+	{{ config[module].station.name }}Init();
 	{% endfor %}
 	#ifdef WIN32
 	// Create a mutex with no initial owner
@@ -73,8 +73,8 @@ int main(void) {
 
 	for(;;) {
 		dbStation(NULL);
-		{% for module in config['modules'] %}
-		{{ config[module]['station.name'] }}(NULL);
+		{% for module in config.modules %}
+		{{ config[module].station.name }}(NULL);
 		{% endfor %}
 	}
 

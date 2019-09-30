@@ -31,13 +31,13 @@ typedef struct RailSensor{
 	uint16_t reqLen;
 }__attribute__ ((__packed__)) RailSensor_st;
 
-{% for define in module['defines'] %}
-#define {{ define['name'] }}	{{ define['value'] }}
+{% for define in module.defines %}
+#define {{ define.name }}	{{ define.value }}
 {% endfor %}
 
 
-int {{ module['station.name'] }}(void *p);
-void {{ module['station.name'] }}Init(void);
+int {{ module.station.name }}(void *p);
+void {{ module.station.name }}Init(void);
 
 #endif /* _SENSOR_H_ */
 

@@ -114,6 +114,6 @@ typedef struct RailSnmp{
 	uint16_t argc;
 }__attribute__ ((__packed__)) RailSnmp_st;
 
-int {{ module['station.name'] }}(void *p);
-void {{ module['station.name'] }}Init(void);
+int {{ module.station.name }}(void *p);
+void {{ module.station.name }}Init(void);
 #endif /*_SNMP_H_*/

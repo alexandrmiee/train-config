@@ -30,7 +30,7 @@
 //#define DB_TRACE
 //#undef DB_TRACE
 
-#define {{ module['debug.level']  }}
+#define {{ module.debug.level  }}
 #ifdef DEBUG_TRACE
 	#define TRACE(trace)	do{\
 								trace;\
@@ -53,8 +53,8 @@ DbTable_st * getDbInstance(){
  * key[0] -> b
  * value[0] -> c
  */
-DbTable_st dbTable[{{module['tables']}}];
-LinkedList_st ll[{{module['rows']}}];
+DbTable_st dbTable[{{module.tables}}];
+LinkedList_st ll[{{module.rows}}];
 int reindex(char *address, uint32_t sizeMax){
 	if(address==0) return EXIT_FAILURE;
 	char *db = address;
@@ -65,7 +65,7 @@ int reindex(char *address, uint32_t sizeMax){
 	uint16_t 	iTable = 0,
 				iLlist = 0;
 	DbTable_st *table = &dbTable[iTable++];
-	{%if module['target']=='WIN' %}	try( (table),"Malloc create db indexes table error",EXIT_FAILURE);
+	{%if module.target=='WIN' %}	try( (table),"Malloc create db indexes table error",EXIT_FAILURE);
 	TRACE(printf("DbTable_st size %d\n",sizeof(DbTable_st)););
 	{%else%}if(!table) return EXIT_FAILURE;{%endif%}
 	dbIndexTable = table;
@@ -82,7 +82,7 @@ int reindex(char *address, uint32_t sizeMax){
 		if(!table->parameters){
 //			table->parameters = malloc(sizeof(LinkedList_st));
 			table->parameters = &ll[iLlist++];
-			{%if module['target']=='WIN' %}try( (table->parameters),"malloc LinkedList_st error",EXIT_FAILURE);
+			{%if module.target=='WIN' %}try( (table->parameters),"malloc LinkedList_st error",EXIT_FAILURE);
 			{%else%}if(!table->parameters) return EXIT_FAILURE;{%endif%}
 		}
 		LinkedList_st *parameters = table->parameters;
@@ -101,7 +101,7 @@ int reindex(char *address, uint32_t sizeMax){
 			if(!parameters->next){
 //				parameters->next = malloc(sizeof(LinkedList_st));
 				parameters->next = &ll[iLlist++];;
-				{%if module['target']=='WIN' %}try( (parameters->next),"malloc LinkedList_st error",EXIT_FAILURE);
+				{%if module.target=='WIN' %}try( (parameters->next),"malloc LinkedList_st error",EXIT_FAILURE);
 				{%else%}if(!parameters->next) return EXIT_FAILURE;{%endif%}
 			}
 			parameters = parameters->next;
@@ -112,7 +112,7 @@ int reindex(char *address, uint32_t sizeMax){
 		if(!(*db)) break;
 //		table->next = malloc(sizeof(DbTable_st));
 		table->next = &dbTable[iTable++];
-		{%if module['target']=='WIN' %}try( (table->next ),"Malloc create db indexes teble error",EXIT_FAILURE);
+		{%if module.target=='WIN' %}try( (table->next ),"Malloc create db indexes teble error",EXIT_FAILURE);
 		{%else%}if(!table->next) return EXIT_FAILURE;{%endif%}
 		table = table->next;
 		memset(table,0,sizeof(DbTable_st));
@@ -166,7 +166,7 @@ uint8_t strConfigTableLen(char *param){
  */
 int setIndex(RailDb_st *rail, Parcel_st *msg){
 	TRACE(printf(">>receive parcel from %I64u\n",msg->sender););
-	{%if module['target']=='WIN' %}try( (rail->params), "the parcel was broken (in rail->params)\n", -1 );
+	{%if module.target=='WIN' %}try( (rail->params), "the parcel was broken (in rail->params)\n", -1 );
 	{%else%}if(!rail->params) return EXIT_FAILURE;{%endif%}
 	reindex(rail->params,rail->sizeMax);
 	/*
@@ -189,7 +189,7 @@ int setIndex(RailDb_st *rail, Parcel_st *msg){
  * char *value
  */
 int findTablesWithKeyValue(char **argv,uint32_t resultLenMax,uint16_t* argc,DbTable_st *db,char* name,char *key, char *value){
-	{%if module['target']=='WIN' %}try( (db),"Database is null",EXIT_FAILURE);
+	{%if module.target=='WIN' %}try( (db),"Database is null",EXIT_FAILURE);
 	{%else%}if(!db) return EXIT_FAILURE;{%endif%}
 	TRACE(printf("Database search tables %s where key %s = %s in %p\n",name,key,value,db););
 	uint16_t nameSize = strlen(name);
@@ -221,7 +221,7 @@ int findTablesWithKeyValue(char **argv,uint32_t resultLenMax,uint16_t* argc,DbTa
 }
 
 int findValues(char **argv,uint32_t resultLenMax,uint16_t* argc,DbTable_st *db,char* name,char *key, char *value){
-	{%if module['target']=='WIN' %}try( (db),"Database is null",EXIT_FAILURE);
+	{%if module.target=='WIN' %}try( (db),"Database is null",EXIT_FAILURE);
 	{%else%}if(!db) return EXIT_FAILURE;{%endif%}
 	TRACE(printf("Database search values %s where key %s = %s in %p\n",name,key,value,db););
 	uint16_t nameSize = strlen(name);
@@ -253,27 +253,27 @@ int findValues(char **argv,uint32_t resultLenMax,uint16_t* argc,DbTable_st *db,c
 }
 
 char dbConfig[] =
-{{ module['database'] }};
+{{ module.database }};
 
 ModuleDb_st *getDbConfig(){
 	return (ModuleDb_st*)dbConfig;
 }
 
-static Parcel_st {{ module['station.parcel'] }}[{{ module['station.parcels'] }}];
-static Train_st {{ module['station.train'] }};
-static Parcel_st* pBox[{{ module['station.parcels'] }}];
-void {{ module['station.name'] }}Init(void){
-	fillDepot(&{{ module['station.train'] }});
-	{{ module['station.train'] }}.box = pBox;
-	for(uint16_t iParcel=0;iParcel<{{ module['station.parcels'] }};iParcel++){
-		{{ module['station.train'] }}.box[iParcel] = (Parcel_st*)&{{ module['station.parcel'] }}[iParcel];
+static Parcel_st {{ module.station.parcel }}[{{ module.station.parcels }}];
+static Train_st {{ module.station.train }};
+static Parcel_st* pBox[{{ module.station.parcels }}];
+void {{ module.station.name }}Init(void){
+	fillDepot(&{{ module.station.train }});
+	{{ module.station.train }}.box = pBox;
+	for(uint16_t iParcel=0;iParcel<{{ module.station.parcels }};iParcel++){
+		{{ module.station.train }}.box[iParcel] = (Parcel_st*)&{{ module.station.parcel }}[iParcel];
 	}
-	{{ module['station.train'] }}.capacity = {{ module['station.parcels'] }};
-	{{ module['station.train'] }}.route = {{ module['station.route'] }};
+	{{ module.station.train }}.capacity = {{ module.station.parcels }};
+	{{ module.station.train }}.route = {{ module.station.route }};
 	reindex(dbConfig,sizeof(dbConfig));
 }
 
-int {{ module['station.name'] }}(void *p){
+int {{ module.station.name }}(void *p){
 	Parcel_st *msg=meetTrain(&dbTrain);
 	while(msg){
 		msg=meetTrain(&dbTrain);

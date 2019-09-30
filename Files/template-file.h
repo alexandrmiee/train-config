@@ -1,15 +1,15 @@
 /*
- * {{ module['files.array'] }}File.h
+ * {{ module.files.array }}File.h
  *
- *  Created on: 4 èþë. 2018 ã.
+ *  Created on: 4 ï¿½ï¿½ï¿½. 2018 ï¿½.
  *      Author: home
  */
 
-#ifndef {{ module['files.array'] }}FILE_H_
-#define {{ module['files.array'] }}FILE_H_
+#ifndef {{ module.files.array }}FILE_H_
+#define {{ module.files.array }}FILE_H_
 
 #include "files.h"
 
-extern FileDesc_st {{ module['files.array'] }}Descriptor;
+extern FileDesc_st {{ module.files.array }}Descriptor;
 
-#endif /* {{ module['files.array'] }}FILE_H_ */
+#endif /* {{ module.files.array }}FILE_H_ */

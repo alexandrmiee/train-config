@@ -164,22 +164,22 @@
   {% set file_idx = 1 %}
   {% for module in modules %}
   <Group>
-    <GroupName>{{ module['folder'] }}</GroupName>
+    <GroupName>{{ module.folder }}</GroupName>
     <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
-    {% for file in module['files'] %}
+    {% for file in module.files %}
 	<File>
       <GroupNumber>{{ loop.index }}</GroupNumber>
       <FileNumber>{{ file_idx}}</FileNumber>
 	  {% set file_idx = file_idx + 1 %}
-      <FileType>{{file['fileType']}}</FileType>
+      <FileType>{{file.fileType}}</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\{{ module['folder'] }}\{{file['fileName']}}</PathWithFileName>
-      <FilenameWithoutPath>{{file['fileName']}}</FilenameWithoutPath>
+      <PathWithFileName>..\{{ module.folder }}\{{file.fileName}}</PathWithFileName>
+      <FilenameWithoutPath>{{file.fileName}}</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

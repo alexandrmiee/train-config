@@ -18,6 +18,6 @@ typedef struct RailTelnet {
 	char *respErr;
 }__attribute__ ((__packed__)) RailTelnet_st;
 
-int {{ module['station.name'] }}(void *p);
-void {{ module['station.name'] }}Init(void);
+int {{ module.station.name }}(void *p);
+void {{ module.station.name }}Init(void);
 #endif /* TELNET_H_ */

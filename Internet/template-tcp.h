@@ -101,7 +101,7 @@ int getClientSocket();
 int getServerSocket();
 int getListenSocket();
 
-int {{ module['station.name'] }}(void *p);
-void {{ module['station.name'] }}Init(void);
+int {{ module.station.name }}(void *p);
+void {{ module.station.name }}Init(void);
 
 #endif /* TCP_H_ */

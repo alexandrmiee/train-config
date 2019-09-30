@@ -24,7 +24,7 @@
 #include "MQTTClient.h"
 
 
-#define {{ module['debug.level']  }}
+#define {{ module.debug.level  }}
 #ifdef DEBUG_TRACE
 	#define TRACE(trace)	do{\
 								trace;\
@@ -33,10 +33,10 @@
 	#define TRACE(trace)
 #endif
 
-#define MQTT_TIMEOUT	{{ module['timeout'] }}
-#define MODULE_ID "{{ module['options.id'] }}"
-{% for topic in module['topics'] %}
-#define {{ topic['name'] }}	"{{ topic['value'] }}"
+#define MQTT_TIMEOUT	{{ module.timeout }}
+#define MODULE_ID "{{ module.options.id }}"
+{% for topic in module.topics %}
+#define {{ topic.name }}	"{{ topic.value }}"
 {% endfor %}
 
 void TimerInit(Timer* timer){
@@ -71,8 +71,8 @@ int TimerLeftMS(Timer* timer){
 
 static Network n;
 static MQTTClient c;
-static uint8_t mqttBufRx[{{ module['buffer.rx'] }}];
-static uint8_t mqttBufTx[{{ module['buffer.tx'] }}];
+static uint8_t mqttBufRx[{{ module.buffer.rx }}];
+static uint8_t mqttBufTx[{{ module.buffer.tx }}];
 
 
 int mqttRead(Network* n, unsigned char* buffer, int len, int timeout_ms) {
@@ -124,7 +124,7 @@ void NetworkInit(Network* n) {
 	n->mqttwrite = mqttWrite;
 	n->disconnect = mqttDisconnect;
 	n->railTcp = NULL;
-	n->socket =	initClient(inet_addr("127.0.0.1"),{{ module['port'] }},IPPROTO_TCP);
+	n->socket =	initClient(inet_addr("127.0.0.1"),{{ module.port }},IPPROTO_TCP);
 }
 
 
@@ -135,9 +135,9 @@ int NetworkConnect(Network* n, char* addr, int port){
 static Parcel_st *box;
 static uint16_t iBox;
 static void *car;
-{% for topic in module['topics'] %}
-void {{ topic['handler'] }}(MessageData* md){
-	TRACE(printf("\tExecute {{ topic['handler']}} %s\n",(char*)md->message->payload););
+{% for topic in module.topics %}
+void {{ topic.handler }}(MessageData* md){
+	TRACE(printf("\tExecute {{ topic.handler}} %s\n",(char*)md->message->payload););
 
 	static char *argv[32];
 	static uint8_t argc;
@@ -146,38 +146,38 @@ void {{ topic['handler'] }}(MessageData* md){
 		(char*)md->message->payload,
 		(char*)md->message->payload,
 		md->message->payloadlen,
-		{{ topic['command']}},
-		{{ topic['separator']}},
+		{{ topic.command}},
+		{{ topic.separator}},
 		&argv[0],
 		&argc,
 		32
 	);
 
-	static {{ module['station.railType'] }} {{ module['station.railName'] }}_{{ loop.index0 }};
+	static {{ module.station.railType }} {{ module.station.railName }}_{{ loop.index0 }};
 
-	{{ module['station.railName'] }}_{{ loop.index0 }}.command = {{ topic['to.command'] }};
-	{{ module['station.railName'] }}_{{ loop.index0 }}.argv = &argv[0];
-	{{ module['station.railName'] }}_{{ loop.index0 }}.argc = argc;
-	{{ module['station.railName'] }}_{{ loop.index0 }}.topic = MODULE_ID {{ topic['name']}};
+	{{ module.station.railName }}_{{ loop.index0 }}.command = {{ topic.to.command }};
+	{{ module.station.railName }}_{{ loop.index0 }}.argv = &argv[0];
+	{{ module.station.railName }}_{{ loop.index0 }}.argc = argc;
+	{{ module.station.railName }}_{{ loop.index0 }}.topic = MODULE_ID {{ topic.name}};
 
-	(({{ topic['from.railType'] }}*)car)->car = &{{ module['station.railName'] }}_{{ loop.index0 }};
+	(({{ topic.from.railType }}*)car)->car = &{{ module.station.railName }}_{{ loop.index0 }};
 
-	sendTrainsFromDepot({{ module['station.route'] }},{{ topic['to.route'] }},box->parcel);
+	sendTrainsFromDepot({{ module.station.route }},{{ topic.to.route }},box->parcel);
 }
 {% endfor %}
 
-static Parcel_st {{ module['station.parcel'] }}[{{ module['station.parcels'] }}];
-static Train_st {{ module['station.train'] }};
-static Parcel_st *pBox[{{ module['station.parcels'] }}];
-void {{ module['station.name'] }}Init(void){
-	fillDepot(&{{ module['station.train'] }});
-	{{ module['station.train'] }}.box = pBox;//malloc(sizeof(Parcel_st*)*{{ module['station.parcels'] }});
+static Parcel_st {{ module.station.parcel }}[{{ module.station.parcels }}];
+static Train_st {{ module.station.train }};
+static Parcel_st *pBox[{{ module.station.parcels }}];
+void {{ module.station.name }}Init(void){
+	fillDepot(&{{ module.station.train }});
+	{{ module.station.train }}.box = pBox;//malloc(sizeof(Parcel_st*)*{{ module.station.parcels }});
 	TRACE(printf("MQTT initializing...\n"););
-	for(uint16_t iParcel=0;iParcel<{{ module['station.parcels'] }};iParcel++){
-		{{ module['station.train'] }}.box[iParcel] = (Parcel_st*)&{{ module['station.parcel'] }}[iParcel];
+	for(uint16_t iParcel=0;iParcel<{{ module.station.parcels }};iParcel++){
+		{{ module.station.train }}.box[iParcel] = (Parcel_st*)&{{ module.station.parcel }}[iParcel];
 	}
-	{{ module['station.train'] }}.capacity = {{ module['station.parcels'] }};
-	{{ module['station.train'] }}.route = {{ module['station.route'] }};
+	{{ module.station.train }}.capacity = {{ module.station.parcels }};
+	{{ module.station.train }}.route = {{ module.station.route }};
 
 	TRACE(printf("\tClient TCP connecting...\n"););
 	NetworkInit(&n);
@@ -187,7 +187,7 @@ void {{ module['station.name'] }}Init(void){
 	MQTTClientInit(
 		&c, /*MQTTClient* c*/
 		&n, /*Network* network*/
-		{{ module['timeout'] }}, /*unsigned int command_timeout_ms*/
+		{{ module.timeout }}, /*unsigned int command_timeout_ms*/
 		mqttBufTx, /*unsigned char* sendbuf*/
 		sizeof(mqttBufTx), /*size_t sendbuf_size*/
 		mqttBufRx, /*unsigned char* readbuf*/
@@ -197,14 +197,14 @@ void {{ module['station.name'] }}Init(void){
 	MQTTPacket_connectData data = MQTTPacket_connectData_initializer;
 	data.willFlag = 1;
 	data.MQTTVersion = 4;
-	data.clientID.cstring = "{{ module['options.id'] }}";
-	data.username.cstring = "{{ module['options.uname'] }}";
-	data.password.cstring = "{{ module['options.password'] }}";
+	data.clientID.cstring = "{{ module.options.id }}";
+	data.username.cstring = "{{ module.options.uname }}";
+	data.password.cstring = "{{ module.options.password }}";
 
-	data.keepAliveInterval = {{ module['options.keepalive'] }};
+	data.keepAliveInterval = {{ module.options.keepalive }};
 	data.cleansession = 1;
 
-	data.will.qos = {{ module['options.qos'] }};
+	data.will.qos = {{ module.options.qos }};
 	data.will.topicName.cstring = "amq.topic";
 	TRACE(printf("\tMQTT client initialized...\n"););
 
@@ -251,12 +251,12 @@ int mqttParser(MQTTClient* c){
 				TRACE(printf("\tMQTT clinet connected\n"););
 
 				TRACE(printf("\tMQTT clients subscribing...\n"););
-				{% for topic in module['topics'] %}
+				{% for topic in module.topics %}
 				MQTTSubscribe(
 					c,	/*MQTTClient* c*/
-					{{ topic['name'] }}, /*const char* topicFilter*/
-					{{ topic['qos'] }}, /*enum QoS qos*/
-					{{ topic['handler'] }} /*messageHandler messageHandler*/
+					{{ topic.name }}, /*const char* topicFilter*/
+					{{ topic.qos }}, /*enum QoS qos*/
+					{{ topic.handler }} /*messageHandler messageHandler*/
 				);
 				{% endfor %}
 			}
@@ -311,12 +311,12 @@ int mqttParser(MQTTClient* c){
 
 
 
-int {{ module['station.name'] }}(void *p){
-	iBox = meetTrainBox(&{{module['station.train'] }},0);
-	box = {{module['station.train'] }}.box[iBox];
+int {{ module.station.name }}(void *p){
+	iBox = meetTrainBox(&{{module.station.train }},0);
+	box = {{module.station.train }}.box[iBox];
 	while(box){
 		{# the train arrives #}
-		if(iBox>{{module['station.train'] }}.capacity) return EXIT_SUCCESS;
+		if(iBox>{{module.station.train }}.capacity) return EXIT_SUCCESS;
 		{# get the car from the train #}
 //		static void *car;
 		car = box->parcel;
@@ -335,14 +335,14 @@ int {{ module['station.name'] }}(void *p){
 			else if( (1 == i) && (ROUTE_JSON_GET_MQTT == (((RailJson_st*)car)->command)) ){
 				topic = ((RailMqtt_st *)car)->topic;
 			}
-			{% for path in module['pathways'] %}
-			else if( ({{  path['from.carNumber'] }} == i) && ({{ path['from.command'] }} == ((({{ path['from.railType'] }}*)car)->command)) ){
+			{% for path in module.pathways %}
+			else if( ({{  path.from.carNumber }} == i) && ({{ path.from.command }} == ((({{ path.from.railType }}*)car)->command)) ){
 				TRACE(printf("\tCOMMAND_MQTT_SEND\n"););
 				if(c.isconnected){
-					{{ path['from.railType'] }} *{{ path['from.railName'] }} = (({{ path['from.railType'] }} *)car);
+					{{ path.from.railType }} *{{ path.from.railName }} = (({{ path.from.railType }} *)car);
 					static MQTTMessage pubmsg;
-					pubmsg.payload = {{ path['from.railName'] }}->response;
-					pubmsg.payloadlen = {{ path['from.railName'] }}->respLen;
+					pubmsg.payload = {{ path.from.railName }}->response;
+					pubmsg.payloadlen = {{ path.from.railName }}->respLen;
 					pubmsg.qos = 0;
 					pubmsg.retained = 0;
 					pubmsg.dup = 0;
@@ -360,8 +360,8 @@ int {{ module['station.name'] }}(void *p){
 			car = ((Hitch_st*)car)->car;
 			i++;
 		}
-		iBox = meetTrainBox(&{{module['station.train'] }},iBox);
-		box = {{module['station.train'] }}.box[iBox];
+		iBox = meetTrainBox(&{{module.station.train }},iBox);
+		box = {{module.station.train }}.box[iBox];
 	}
 
 	return EXIT_SUCCESS;

@@ -37,8 +37,8 @@ int main(void) {
 
 	_initNetAdapter(inet_addr("127.0.0.1"),80,IPPROTO_TCP);
 
-	{% for module in config['modules'] %}
-	{{ config[module]['station.name'] }}Init();
+	{% for module in config.modules %}
+	{{ config[module].station.name }}Init();
 	{% endfor %}
 
 	#ifdef WIN32
@@ -73,8 +73,8 @@ int main(void) {
 
 	for(;;) {
 		dbStation(NULL);
-		{% for module in config['modules'] %}
-		{{ config[module]['station.name'] }}(NULL);
+		{% for module in config.modules %}
+		{{ config[module].station.name }}(NULL);
 		{% endfor %}
 	}
 

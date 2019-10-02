@@ -240,16 +240,16 @@ int {{ module.station.name }}(void *p){
 				try( ({{ path.from.railName }}), "\tthe rails {{ path.from.railType }} do not go to {{  module.station.name }}\n", EXIT_FAILURE );
 
 				{# load the parcel from the train #}
-				{%- if path.from.loader is not none -%}
+				{% if path.from.loader %}
 				{{ module.station.railName }}_{{ loop.index0 }}.response = (uint8_t*){{ path.from.railName }}->response;
 				{{ module.station.railName }}_{{ loop.index0 }}.respLen = {{ path.from.railName }}->respLen;
 				TRACE(printf("\tSend response:\n\t\t%d bytes\n\t\t%s\n",{{ module.station.railName }}_{{ loop.index0 }}.respLen,{{ module.station.railName }}_{{ loop.index0 }}.response););
-				{%- else %}
-				{%- endif %}
+				{% else %}
+				{% endif %}
 
 
 				{# select loader for new train #}
-				{%- if path.to.loader=='send' -%}
+				{% if path.to.loader=='send' -%}
 				/*
 				 * send response to TCP client or
 				 * send request to TCP server
@@ -261,14 +261,14 @@ int {{ module.station.name }}(void *p){
 					{{ module.station.railName }}_{{ loop.index0 }}.respLen,
 					0
 				);
-				{%- else %}
+				{% else %}
 				/*
 				 * send message to TCP observers
 				 * example  railTcp->to_port=80 send message to ROUTE_HTTP
 				 */
 				{{ path.from.railName }}->car = &{{ module.station.railName }}_{{ loop.index0 }};
 				{{ path.to.loader }}({{ module.station.route }},{{ path.to.route }},box->parcel);
-				{%- endif %}
+				{% endif %}
 				(({{ path.from.railType }} *)car)->command = 0;
 			}
 

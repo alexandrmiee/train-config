@@ -245,7 +245,7 @@ int {{ module.station.name }}(void *p){
 			{{ module.station.railName }}_{{ loop.index0 }}.respOk = HEADER_OK_TEXT;
 			{{ module.station.railName }}_{{ loop.index0 }}.respErr = HEADER_ERR_404;
 			{{ module.station.railName }}_{{ loop.index0 }}.command = {{ gets.to.command }};
-			{%- if gets.from.loader is not none -%}
+			{% if gets.from.loader %}
 			{{ module.station.railName }}_{{ loop.index0 }}.attach = body;
 			if({{ gets.from.loader }}(&{{ module.station.railName }}_{{ loop.index0 }},railTcp)!=EXIT_SUCCESS) return EXIT_SUCCESS;
 			{% endif %}

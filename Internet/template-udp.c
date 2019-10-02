@@ -125,7 +125,7 @@ int {{ module.station.name }}(void *p){
 				static {{ module.station.railType }} {{ module.station.railName }}_{{ loop.index0 }}={NULL};
 				try( ({{ path.from.railName }}), "\tthe rails {{ path.from.railType }} do not go to {{  module.station.name }}\n", EXIT_FAILURE );
 				{# load the parcel from the train #}
-				{%- if path.from.loader is not none -%}
+				{% if path.from.loader %}
 				{{ module.station.railName }}_{{ loop.index0 }}.response = (uint8_t*){{ path.from.railName }}->response;
 				{{ module.station.railName }}_{{ loop.index0 }}.respLen = {{ path.from.railName }}->respLen;
 				TRACE(printf("\tSend response:\n\t\t%d bytes\n\t\t%s\n",{{ module.station.railName }}_{{ loop.index0 }}.respLen,{{ module.station.railName }}_{{ loop.index0 }}.response););
@@ -133,12 +133,12 @@ int {{ module.station.name }}(void *p){
 					TRACE(printf("0x%02X ",{{ module.station.railName }}_{{ loop.index0 }}.response[l]););
 				}
 				TRACE(printf("\n"););
-				{%- else %}
-				{%- endif %}
+				{% else %}
+				{% endif %}
 
 
 				{# select loader for new train #}
-				{%- if path.to.loader=='sendto' -%}
+				{% if path.to.loader=='sendto' -%}
 				/*
 				 * send response to TCP client or
 				 * send request to TCP server
@@ -153,14 +153,14 @@ int {{ module.station.name }}(void *p){
 					(struct sockaddr*)sadr,
 					slen
 				);
-				{%- else %}
+				{% else %}
 				/*
 				 * send message to TCP observers
 				 * example  railTcp->to_port=80 send message to ROUTE_HTTP
 				 */
 				{{ path.from.railName }}->car = &{{ module.station.railName }}_{{ loop.index0 }};
 				{{ path.to.loader }}({{ module.station.route }},{{ path.to.route }},box->parcel);
-				{%- endif %}
+				{% endif %}
 				(({{ path.from.railType }} *)car)->command = 0;
 			}
 

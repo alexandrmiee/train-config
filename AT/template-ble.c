@@ -17,7 +17,7 @@
 #include "core-utils.h"
 #include "RestFullController.h"
 
-{%for module in modules%}#include "{{module}}.h"
+{%for module in modules.modules%}#include "{{module}}.h"
 {%endfor%}
 
 #define {{ module.debug.level  }}

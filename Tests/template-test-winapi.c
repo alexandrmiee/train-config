@@ -63,7 +63,7 @@ int main(void) {
 	initAdapter();
 
 	{% for module in config.modules %}
-	{%- if config[module].station.name is not none -%}
+	{% if config[module].station.name %}
 	{{ config[module].station.name }}Init();
 	{% endif %}
 	{% endfor %}
@@ -124,7 +124,7 @@ int main(void) {
 	for(;;) {
 		dbStation(NULL);
 		{% for module in config.modules %}
-		{%- if config[module].station.name is not none -%}
+		{% if config[module].station.name %}
 		{{ config[module].station.name }}(NULL);
 		{% endif %}
 		{% endfor %}

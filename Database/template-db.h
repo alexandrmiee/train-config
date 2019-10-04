@@ -37,7 +37,7 @@ typedef struct RailDb{
 	int(*function)(struct RailDb *params, Parcel_st* box);
 }RailDb_st;
 
-{{ module.typedef }}
+{{ module.databaseTypedef }}
 
 uint8_t strConfigLen(char *param);
 uint8_t strConfigTableLen(char *param);

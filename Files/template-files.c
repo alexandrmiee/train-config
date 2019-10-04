@@ -32,12 +32,12 @@ static FILINFO fno;
 
 
 {% for file in module.files %}
-extern FileDesc_st {{ file.array }}Descriptor;
+extern FileDesc_st {{ file.arrayName }}Descriptor;
 {% endfor %}
 
 FileDesc_st *files[] = {
 	{% for file in module.files %}
-	&{{ file.array }}Descriptor,
+	&{{ file.arrayName }}Descriptor,
 	{% endfor %}
 	NULL
 };

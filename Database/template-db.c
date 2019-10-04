@@ -253,7 +253,7 @@ int findValues(char **argv,uint32_t resultLenMax,uint16_t* argc,DbTable_st *db,c
 }
 
 char dbConfig[] =
-{{ module.database }};
+{{ module.databaseContent }};
 
 ModuleDb_st *getDbConfig(){
 	return (ModuleDb_st*)dbConfig;

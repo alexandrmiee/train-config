@@ -124,7 +124,11 @@ void NetworkInit(Network* n) {
 	n->mqttwrite = mqttWrite;
 	n->disconnect = mqttDisconnect;
 	n->railTcp = NULL;
+	#ifdef WIN32
 	n->socket =	initClient(inet_addr("127.0.0.1"),{{ module.port }},IPPROTO_TCP);
+	#elif __linux__
+	n->socket =	initClient(inet_addr("127.0.0.1"),{{ module.port }},NULL);
+	#endif
 }
 
 

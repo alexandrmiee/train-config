@@ -20,11 +20,21 @@
 #include "http.h"
 #include "files.h"
 
+
 #ifdef WIN32
 #include 	<windows.h>
 #include	<winsock2.h>
 #include 	<ws2tcpip.h>
+
+int getListenSocket(){
+	return clientSoket;
+}
+#else
+#define INVALID_SOCKET -1
 #endif
+
+int clientSoket = INVALID_SOCKET;
+
 
 #define {{ module.debug.level  }}
 #ifdef DEBUG_TRACE
@@ -35,10 +45,9 @@
 	#define TRACE(trace)
 #endif
 
-int clientSoket = INVALID_SOCKET;
-int getListenSocket(){
-	return clientSoket;
-}
+
+
+
 
 int initAdapter(void){
 	#ifdef WIN32
@@ -125,6 +134,8 @@ int initServer(uint32_t inetAddress,uint16_t port, uint8_t protocol){
 
 #ifdef WIN32
 SOCKET ConnectSocket = INVALID_SOCKET;
+#else
+int ConnectSocket = INVALID_SOCKET;
 #endif
 int initClient(uint32_t inetAddress,uint16_t port, uint8_t protocol){
 	#ifdef WIN32
@@ -145,22 +156,22 @@ int initClient(uint32_t inetAddress,uint16_t port, uint8_t protocol){
 	ConnectSocket=socket(AF_INET, SOCK_STREAM, protocol);
 
 	if (ConnectSocket == INVALID_SOCKET) {
-	    printf("Error at socket(): %d\n", WSAGetLastError());
-	    WSACleanup();
-	    return 1;
+		printf("Error at socket(): %d\n", WSAGetLastError());
+		WSACleanup();
+		return 1;
 	}
 
 	// Connect to server.
 	int iResult = connect(ConnectSocket, (SOCKADDR *) &service, sizeof (service));
 	if (iResult == SOCKET_ERROR) {
-	    closesocket(ConnectSocket);
-	    ConnectSocket = INVALID_SOCKET;
+		closesocket(ConnectSocket);
+		ConnectSocket = INVALID_SOCKET;
 	}
 
 	if (ConnectSocket == INVALID_SOCKET) {
-	    printf("Unable to connect to server!\n");
-	    WSACleanup();
-	    return 1;
+		printf("Unable to connect to server!\n");
+		WSACleanup();
+		return 1;
 	}
 
 	#endif

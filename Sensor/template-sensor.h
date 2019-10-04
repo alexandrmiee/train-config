@@ -17,7 +17,7 @@
 #include "core-routes.h"
 #include "core-utils.h"
 
-{%for module in modules%}
+{%for module in modules.modules%}
 #include "{{module}}.h"
 {%endfor%}
 

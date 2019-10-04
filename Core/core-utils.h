@@ -58,6 +58,8 @@ typedef uint64_t dtime_t;
 
 #ifdef WIN32
 #define RTC_TIME(t) t=time(NULL)
+#elif __linux__
+#define RTC_TIME(t) t=time(NULL)
 #else
 extern dtime_t rtcTime_s;
 

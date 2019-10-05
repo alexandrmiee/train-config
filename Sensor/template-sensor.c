@@ -39,13 +39,13 @@ static Parcel_st *pBox[{{ module.station.parcels }}];
 
 
 void {{ module.station.name }}Init(void){
-	fillDepot(&{{ module.station.train }});
 	{{ module.station.train }}.box = pBox;
 	for(uint16_t iParcel=0;iParcel<{{ module.station.parcels }};iParcel++){
 		{{ module.station.train }}.box[iParcel] = (Parcel_st*)&{{ module.station.parcel }}[iParcel];
 	}
 	{{ module.station.train }}.capacity = {{ module.station.parcels }};
 	{{ module.station.train }}.route = {{ module.station.route }};
+	fillDepot(&{{ module.station.train }});
 }
 
 

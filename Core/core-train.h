@@ -36,7 +36,7 @@ typedef struct Train{
 
 Parcel_st *meetTrain(Train_st *train);
 uint16_t meetTrainBox(Train_st *train,uint16_t box);
-int sendTrain(uint64_t from ,Train_st *train, void *parcel);
+// int sendTrain(uint64_t from ,Train_st *train, void *parcel);
 int fillDepot(Train_st *train);
 int sendTrainsFromDepot(uint64_t from ,uint64_t to, void *parcel);
 

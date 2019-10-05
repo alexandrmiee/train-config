@@ -479,11 +479,11 @@ Train_st {{ module.station.train }};
 void {{ module.station.name }}Init(void){
 	//{{ module.station.railName }}.table = getDbInstance();
 
-	fillDepot(&{{ module.station.train }});
 	{{ module.station.train }}.box = malloc(sizeof(Parcel_st));
 	{{ module.station.train }}.box[0] = (Parcel_st*)&{{ module.station.parcel }};
 	{{ module.station.train }}.capacity = {{ module.station.parcels }};
 	{{ module.station.train }}.route = {{ module.station.route }};
+	fillDepot(&{{ module.station.train }});
 }
 
 /*

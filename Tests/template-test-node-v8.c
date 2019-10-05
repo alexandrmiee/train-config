@@ -28,6 +28,7 @@ int main(void) {
 		dbStation(NULL);
 		{% for module in modules.modules %}{% if modules[module].station.name %}
 		{{ modules[module].station.name }}(NULL);{% endif %}{% endfor %}
+		tcpProxyStation();
 	}
 
 	return EXIT_SUCCESS;

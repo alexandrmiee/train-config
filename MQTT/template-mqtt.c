@@ -174,7 +174,6 @@ static Parcel_st {{ module.station.parcel }}[{{ module.station.parcels }}];
 static Train_st {{ module.station.train }};
 static Parcel_st *pBox[{{ module.station.parcels }}];
 void {{ module.station.name }}Init(void){
-	fillDepot(&{{ module.station.train }});
 	{{ module.station.train }}.box = pBox;//malloc(sizeof(Parcel_st*)*{{ module.station.parcels }});
 	TRACE(printf("MQTT initializing...\n"););
 	for(uint16_t iParcel=0;iParcel<{{ module.station.parcels }};iParcel++){
@@ -182,6 +181,7 @@ void {{ module.station.name }}Init(void){
 	}
 	{{ module.station.train }}.capacity = {{ module.station.parcels }};
 	{{ module.station.train }}.route = {{ module.station.route }};
+	fillDepot(&{{ module.station.train }});
 
 	TRACE(printf("\tClient TCP connecting...\n"););
 	NetworkInit(&n);

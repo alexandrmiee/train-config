@@ -153,13 +153,13 @@ static int owCycle(stateOwreset_t state){
 
 
 void {{ module.station.name }}Init(void){
-	fillDepot(&{{ module.station.train }});
 	{{ module.station.train }}.box = pBox;//malloc(sizeof(Parcel_st*)*{{ module.station.parcels }});
 	for(uint16_t iParcel=0;iParcel<{{ module.station.parcels }};iParcel++){
 		{{ module.station.train }}.box[iParcel] = (Parcel_st*)&{{ module.station.parcel }}[iParcel];
 	}
 	{{ module.station.train }}.capacity = {{ module.station.parcels }};
 	{{ module.station.train }}.route = {{ module.station.route }};
+	fillDepot(&{{ module.station.train }});
 
 }
 

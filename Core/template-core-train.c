@@ -14,10 +14,10 @@
 #include "core-routes.h"
 #include "core-utils.h"
 
-{%if traceNode %}
+{%if module.traceNode %}
 #include "integration-node.h"
 #define MODULE_NAME __FILE__
-char outputString [{{outputStringSize}}];
+char outputString [{{module.outputStringSize}}];
 {% endif %}
 
 Parcel_st *meetTrain(Train_st *train){
@@ -42,16 +42,15 @@ uint16_t meetTrainBox(Train_st *train,uint16_t box){
 	for(uint16_t iBox=box;iBox<train->capacity;iBox++){
 		if((*train->box)[iBox].isFree==1){
 			(*train->box)[iBox].isFree = 0;
-			{%if traceNode %}
-				sprintf(outputString,"{\
-						action: meetTrainBox,\
-						train:{\
-							pointer:%p,
-							route: %I64u,
-							capacity: %d,
-						},\
-						box:%d,\
-					}",
+			{%if module.traceNode %}
+				sprintf(outputString,
+						"action: 'meetTrainBox',"
+						"train:{"
+							"pointer:'%p',"
+							"route: %d,"
+							"capacity: %d,"
+						"},"
+						"box:%d,",
 				train,train->route,train->capacity,iBox);
 				traceStdOut(MODULE_NAME,outputString);
 			{% endif %}
@@ -60,45 +59,6 @@ uint16_t meetTrainBox(Train_st *train,uint16_t box){
 	}
 	return train->capacity+1;
 }
-
-/*
-	load data to list array buffer
-	walk around list array of pointers
-	find empty slot with flag isFree==0
-	set isFree - new data flag, parcel - pointer to data, sender - identify of call module
-	return EXIT_SUCCESS
-
-	if not found - return EXIT_FAILURE
-*/
-// int sendTrain(uint64_t from ,Train_st *train, void *parcel){
-// 	int result = EXIT_FAILURE;
-// 	uint16_t iBox=0
-// 	for(;iBox<train->capacity;iBox++){
-// 		if((*train->box)[iBox].isFree==0){
-// 			(*train->box)[iBox].parcel = parcel;
-// 			(*train->box)[iBox].sender = from;
-// 			(*train->box)[iBox].isFree = 1;
-// 			result = EXIT_SUCCESS;
-// 			break;
-// 		}
-// 	}
-// 	{%if traceNode %}
-// 		sprintf(outputString,"{\
-// 				action: sendTrain,\
-// 				train:{\
-// 					pointer:%p,
-// 					route: %I64u,
-// 					capacity: %d,
-// 					boxArrayIndex:%d
-// 				},\
-// 				from:%I64u,\
-// 				result:%d,
-// 			}",
-// 		train,train->route,train->capacity,iBox,from,result);
-// 		traceStdOut(MODULE_NAME,outputString);
-// 	{% endif %}
-// 	return result;
-// }
 
 /*
 	add new Train_st in linked list `tail`
@@ -114,6 +74,17 @@ int fillDepot(Train_st *train){
 		tail = train;
 		tail->prev = t;
 	}
+	{%if module.traceNode %}
+	sprintf(outputString,
+			"action:'fillDepot',"
+			"train:{"
+				"pointer:'%p',"
+				"route: %d,"
+				"capacity: %d,"
+			"},",
+	train,train->route,train->capacity);
+	traceStdOut(MODULE_NAME,outputString);
+	{% endif %}
 	return EXIT_SUCCESS;
 }
 
@@ -136,27 +107,28 @@ int sendTrainsFromDepot(uint64_t from ,uint64_t to, void *parcel){
 					(*train->box)[iBox].sender = from;
 					(*train->box)[iBox].parcel = parcel;
 					(*train->box)[iBox].isFree = 1;
+					{%if module.traceNode %}
+					sprintf(
+						outputString,
+						"action: 'sendTrainsFromDepot',"
+						"train:{"
+							"pointer:'%p',"
+							"route: %d,"
+							"capacity: %d,"
+							"boxArrayIndex:%d,"
+						"},"
+						"from:%d,"
+						"to:%d,",
+						train,train->route,train->capacity,iBox,from,to
+					);
+					traceStdOut(MODULE_NAME,outputString);
+					{% endif %}
 					break;
 				}
 			}
 		}
 		train = train->prev;
 	}
-	{%if traceNode %}
-		sprintf(outputString,"{\
-				action: sendTrainsFromDepot,\
-				train:{\
-					pointer:%p,
-					route: %I64u,
-					capacity: %d,
-					boxArrayIndex:%d
-				},\
-				from:%I64u,\
-				to:%I64u,\
-			}",
-		train,train->route,train->capacity,iBox,from,to);
-		traceStdOut(MODULE_NAME,outputString);
-	{% endif %}
 	return EXIT_SUCCESS;
 }
 
